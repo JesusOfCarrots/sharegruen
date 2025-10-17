@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+    padding: 20px;
+  }
+  
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  #canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #stage-container {
+    border: 1px solid #ccc;
+    background: white;
+    width: fit-content;
+    height: fit-content;
+  }
+  

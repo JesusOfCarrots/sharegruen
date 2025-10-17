@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Share Gruen Editor</title>
+
+    <script src="https://unpkg.com/konva@8/konva.min.js"></script>
+</head>
+<body>
+    <div class="toolbar">
+        <label for="bgSelect">Hitergrund:</label>
+        <select id="bgSelect">
+            <option value="GJ_dunkelGruen.png">Dunkelgrün</option>
+            <option value="GJ_Gruen.png">Gruen</option>
+            <option value="GJ_Lila.png">Lila</option>
+            <option value="GJ_Orange.png">Orange</option>
+            <option value="GJ_Pink.png">Pink</option>
+
+            <option value="GJ_Verlaufe_IG.png">Verlauf1</option>
+            <option value="GJ_Verlaufe_IG2.png">Verlauf2</option>
+            <option value="GJ_Verlaufe_IG3.png">Verlauf3</option>
+            <option value="GJ_Verlaufe_IG4.png">Verlauf4</option>
+            <option value="GJ_Verlaufe_IG5.png">Verlauf5</option>
+            <option value="GJ_Verlaufe_IG6.png">Verlauf6</option>
+            <option value="GJ_Verlaufe_IG7.png">Verlauf7</option>
+            <option value="GJ_Verlaufe_IG8.png">Verlauf8</option>
+            <option value="GJ_Verlaufe_IG9.png">Verlauf9</option>
+            <option value="GJ_Verlaufe_IG10.png">Verlauf10</option>
+            <option value="GJ_Verlaufe_IG11.png">Verlauf11</option>
+            <option value="GJ_Verlaufe_IG12.png">Verlauf12</option>
+        </select>
+
+        <button id="addText">Text hinzufuegen</button>
+        <button id="addHeadline">Headline mit CD-HJinterlegung</button>
+        <button id="export">Exportieren (PNG)</button>
+    </div>
+
+    <div id="canvas-container">
+        <div id="stage-container"></div>
+    </div>
+
+    <script>
+        const W = {{width}};
+        const H = {{height}};
+    </script>
+    <script src="/static/js/editor.js"></script>
+</body>
+</html>

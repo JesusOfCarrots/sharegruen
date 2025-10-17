@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>Share Gruen</title>
+</head>
+<body>
+    <main class="container">
+        <h1>Grüner Sharepic Generator</h1>
+        <p>Wähle ein Format:</p>
+        <ul>
+            {% for key, val in formats.items() %}
+            <li><a href="/editor?fmt={{key}}">{{val.label}}</a></li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>
