@@ -1,5 +1,29 @@
+html, body{
+  margin: 0;
+  padding: 0;
+  font-family: 'Wix Made For Display';
+}
+
+@font-face {
+  font-family: 'Wix Made For Display';
+  src: url(/static/fonts/WixMadeforDisplay-ExtraBold.ttf);
+  font-weight: bolder;
+}
+@font-face {
+  font-family: 'Wix Made For Display';
+  src: url(/static/fonts/WixMadeforDisplay-Bold.ttf);
+  font-weight: bold;
+}
+@font-face {
+  font-family: 'Wix Made For Display';
+  src: url(/static/fonts/WixMadeforDisplay-SemiBold.ttf);
+  font-weight: normal;
+}
+
+
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Wix Made For Display';
     background: #f3f3f3;
     padding: 20px;
   }
@@ -11,19 +35,29 @@ body {
     margin-bottom: 10px;
   }
   
-  #canvas-container {
+#canvas-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  #stage-container {
+    position: relative;
+}
+
+#stage-container {
+    flex: 1;
     border: 1px solid #ccc;
-    background: white;
-    width: fit-content;
-    height: fit-content;
-  }
-  .bg-options {
+
+}
+
+#sidebar {
+    width: 20%;
+    padding: 10px;
+    border-left: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+
+
+
+
+.bg-options {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;

@@ -1,4 +1,4 @@
-// Stage und Layer
+// --- Stage und Layer ---
 const stage = new Konva.Stage({
     container: 'stage-container',
     width: W,
@@ -16,39 +16,94 @@ let bgImage = new Konva.Image({
 });
 layer.add(bgImage);
 
-document.querySelectorAll('.bg-thumb').forEach(img => {
-    img.addEventListener('click', () => {
-        // Hintergrund wechseln
-        loadBackground(img.dataset.src);
-
-        // Markiere ausgewähltes Bild
-        document.querySelectorAll('.bg-thumb').forEach(i => i.classList.remove('selected'));
-        img.classList.add('selected');
-    });
-});
-
-// Optional: Standardauswahl markieren
-document.querySelector('.bg-thumb').classList.add('selected');
-
-
-// Funktion zum Laden eines Hintergrunds
+// --- Hintergrund laden ---
 function loadBackground(src) {
     const imageObj = new Image();
     imageObj.onload = function() {
         bgImage.image(imageObj);
         layer.batchDraw(); // Layer aktualisieren
     };
-    imageObj.src = '/static/backgrounds/' + src; // Pfad ggf. anpassen
+    imageObj.src = '/static/backgrounds/' + src;
 }
 
-// Event Listener für das Hintergrund-Select
-const bgSelect = document.getElementById('bgSelect');
-bgSelect.addEventListener('change', () => {
-    loadBackground(bgSelect.value);
+// --- Hintergrund-Thumbnails ---
+const thumbs = document.querySelectorAll('.bg-thumb');
+thumbs.forEach(img => {
+    img.addEventListener('click', () => {
+        loadBackground(img.dataset.src);
+
+        thumbs.forEach(i => i.classList.remove('selected'));
+        img.classList.add('selected');
+    });
 });
 
 // Standard-Hintergrund laden
-loadBackground(bgSelect.value);
+const firstThumb = thumbs[0];
+firstThumb.classList.add('selected');
+loadBackground(firstThumb.dataset.src);
+
+
+
+// Select Node
+let selectedNode = null;
+
+function showProperties(node){
+    const container = document.getElementById('properties');
+    container.innerHTML = ''; //delete prevois content
+
+    if (node instanceof Konva.Text){
+        const inputText = document.createElement('input');
+        inputText.type = 'text';
+        inputText.value = node.text();
+        inputText.addEventListener('input', () => {
+            node.text(inputText.value);
+            layer.batchDraw();
+        });
+        container.appendChild(document.createTextNode('Text:'));
+        container.appendChild(inputText);
+
+        //Font Size
+        const inputFont = document.createElement('input');
+        inputFont.type = 'number';
+        inputFont.value = node.fontSize();
+        inputFont.addEventListener('input', () => {
+            node.fontSize(Number(inputFont.vaule));
+            layer.batchDraw();
+        });
+        container.appendChild(document.createElement('br'));
+        container.appendChild(document.createTextNode('Font Size:'));
+        container.appendChild(inputFont);
+
+        //Color
+        const inputColor = document.createElement('input');
+        inputColor.type = 'color';
+        inputColor.value = rgbToHex(node.fill());
+        inputColor.addEventListener('input', () => {
+            node.fill(inputColor.value);
+            layer.batchDraw();
+        });
+        container.appendChild(document.createElement('br'));
+        container.appendChild(document.createTextNode('Farbe:'));
+        container.appendChild(inputColor);
+    }
+}
+
+function rgbToHex(color) {
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.fillStyle = color;
+    return ctx.fillStyle;
+}
+
+//Node select 
+stage.on('click', (e) => {
+    if (e.target === stage) {
+        selectedNode = null;
+        document.getElementById('properties').innerHTML = '<p>Wähle ein Element aus, um es zu bearbeiten.</p>';
+        return;
+    }
+    selectedNode = e.target;
+    showProperties(selectedNode);
+});
 
 // --- Text hinzufügen ---
 document.getElementById('addText').addEventListener('click', () => {
@@ -57,29 +112,12 @@ document.getElementById('addText').addEventListener('click', () => {
         x: 50,
         y: 50,
         fontSize: 60,
-        fontFamily: 'Arial',
+        fontFamily: 'Wix Made For Display',
         fill: '#000',
         draggable: true
     });
     layer.add(text);
     layer.draw();
-
-    text.on('dblclick', () => {
-        const textarea = document.createElement('textarea');
-        textarea.value = text.text();
-        textarea.style.position = 'absolute';
-        textarea.style.left = stage.container().offsetLeft + text.x() + 'px';
-        textarea.style.top = stage.container().offsetTop + text.y() + 'px';
-        textarea.style.fontSize = text.fontSize() + 'px';
-        document.body.appendChild(textarea);
-        textarea.focus();
-
-        textarea.addEventListener('blur', () => {
-            text.text(textarea.value);
-            document.body.removeChild(textarea);
-            layer.draw();
-        });
-    });
 });
 
 // --- Headline mit Balken ---
@@ -99,7 +137,7 @@ document.getElementById('addHeadline').addEventListener('click', () => {
         x: 20,
         y: (barHeight - fontSize) / 2,
         fontSize: fontSize,
-        fontFamily: 'Arial',
+        fontFamily: 'Wix Made For Display',
         fill: '#000'
     });
 
@@ -109,16 +147,4 @@ document.getElementById('addHeadline').addEventListener('click', () => {
     layer.draw();
 });
 
-// --- Export ---
-document.getElementById('export').addEventListener('click', async () => {
-    const dataURL = stage.toDataURL({ pixelRatio: 2 });
-    const res = await fetch('/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dataURL })
-    });
-    const json = await res.json();
-    if (json.url) {
-        window.open(json.url, '_blank');
-    }
-});
+

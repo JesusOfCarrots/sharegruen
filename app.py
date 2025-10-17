@@ -7,7 +7,8 @@ UPLOAD_DIR = 'uploads'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 FORMATS = {
-    "insta_post": {"w":1080, "h":1080, "label":"Instagram Post (1080x1080)"}
+    "insta_post": {"w":1080, "h":1350, "label":"Instagram Post (1080x1350)"},
+    "insta_stoy": {"w":1080, "h":1080, "label":"Instagram Stoy (1080x1080)"}
 }
 
 
