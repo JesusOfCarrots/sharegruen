@@ -23,4 +23,21 @@ body {
     width: fit-content;
     height: fit-content;
   }
-  
+  .bg-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.bg-thumb {
+    width: 60px;
+    height: 40px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border 0.2s;
+}
+
+.bg-thumb:hover, .bg-thumb.selected {
+    border: 2px solid #007bff;
+}

@@ -16,6 +16,21 @@ let bgImage = new Konva.Image({
 });
 layer.add(bgImage);
 
+document.querySelectorAll('.bg-thumb').forEach(img => {
+    img.addEventListener('click', () => {
+        // Hintergrund wechseln
+        loadBackground(img.dataset.src);
+
+        // Markiere ausgewähltes Bild
+        document.querySelectorAll('.bg-thumb').forEach(i => i.classList.remove('selected'));
+        img.classList.add('selected');
+    });
+});
+
+// Optional: Standardauswahl markieren
+document.querySelector('.bg-thumb').classList.add('selected');
+
+
 // Funktion zum Laden eines Hintergrunds
 function loadBackground(src) {
     const imageObj = new Image();
