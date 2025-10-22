@@ -10,6 +10,11 @@ const FONT_FAMILY = 'Wix Made For Display';
 const COLOR_BLACK = '#000000';
 const COLOR_WHITE = '#ffffff';
 const COLOR_HELLGRUEN = '#c7ff7a';
+const COLOR_LILA = '#9f88ff';
+const COLOR_PINK = '#f28ade';
+const COLOR_ORANGE = '#ff8568';
+const COLOR_DUNKELGRUEN = '#33c270';
+
 
 //#region BACKGROUND
 let bgImageObj = null;
@@ -21,7 +26,8 @@ function loadBackground(src) {
         const scale = Math.max(cw / img.width, ch / img.height);
 
         img.set({
-            left: 0, top: 0,
+            left: (cw - img.width * scale) / 2,
+            top: (ch - img.height * scale) / 2,
             originX: 'left',
             originY: 'top',
             selectable: false,
@@ -236,8 +242,9 @@ function updateHeadlineBar(group) {
     setTimeout(() => {
         text.initDimensions();
 
+        console.log(text.top, text.height , (text.fontSize * text.lineHeight));
         bar.set({
-            left: text.left - padX,
+            left: textBounds.left - padX,
             top: text.top + text.height - (text.fontSize * text.lineHeight),
             width: text.width + padX * 2,
             height: text.fontSize * text.lineHeight
@@ -245,7 +252,7 @@ function updateHeadlineBar(group) {
 
         group.addWithUpdate();
         canvas.requestRenderAll();
-    }, 50);
+    }, 50); 
 }
 
 document.getElementById('addHeadline').addEventListener('click', () => {

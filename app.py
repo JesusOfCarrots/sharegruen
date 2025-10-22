@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify
 import os, re, base64
 from datetime import datetime
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 UPLOAD_DIR = 'uploads'
