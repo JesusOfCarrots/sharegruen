@@ -4,6 +4,7 @@ const canvas = new fabric.Canvas('editorCanvas', {
     preserveObjectStacking: true
 });
 
+
 // CD BASICS
 const FONT_FAMILY = 'Wix Made For Display';
 const COLOR_BLACK = '#000000';
