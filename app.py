@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify
 import os, re, base64
 from datetime import datetime
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 UPLOAD_DIR = 'uploads'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+# FORMATS
 FORMATS = {
-    "insta_post": {"w":1080, "h":1350, "label":"Instagram Post (1080x1350)"},
-    "insta_stoy": {"w":1080, "h":1080, "label":"Instagram Stoy (1080x1080)"}
+    "insta_post":  {"w": 1080, "h": 1350, "label": "Instagram Post (1080×1350)"},
+    "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
 }
 
 
@@ -39,7 +41,7 @@ def upload():
 @app.route('/export', methods=['POST'])
 def export():
     dataurl = request.json.get('dataURL')
-    if not dataurl:
+    if not dataurl or ',' not in dataurl:
         return jsonify({"error":"no data"}), 400
     header, encoded = dataurl.split(',', 1)
     mime = header.split(';')[0].split(':')[1]
