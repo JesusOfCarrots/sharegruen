@@ -15,13 +15,19 @@ let bgImageObj = null;
 
 function loadBackground(src) {
     fabric.Image.fromURL('/static/backgrounds/' + src, (img) => {
+        const cw = canvas.getWidth();
+        const ch = canvas.getHeight();
+        const scale = Math.max(cw / img.width, ch / img.height);
+
         img.set({
             left: 0, top: 0,
+            originX: 'left',
+            originY: 'top',
             selectable: false,
-            evented: false
+            evented: false,
+            scaleX: scale,
+            scaleY: scale
         });
-        img.scaleToWidth(canvas.getWidth());
-        img.scaleToHeight(canvas.getHeight());
 
         if (bgImageObj) {
             canvas.remove(bgImageObj);
@@ -212,6 +218,12 @@ document.getElementById('addText').addEventListener('click', () => {
     text._isHeadlineChild = true;
     text._parentGroup = group;
 
+    // ensure correct Bar size after fonts loaded
+    document.fonts.ready.then(() => {
+        updateHeadlineBar(group);
+        canvas.requestRenderAll();
+    });
+
     return group;
 }
 
@@ -220,18 +232,19 @@ function updateHeadlineBar(group) {
     const bar = group._barRect;
     const padX = 20;
 
-    text.set({ width: undefined });
-    text.initDimensions();
+    setTimeout(() => {
+        text.initDimensions();
 
-    bar.set({
-        left: text.left - padX,
-        top: text.top + text.height - (text.fontSize * text.lineHeight),
-        width: text.width + padX * 2,
-        height: text.fontSize * text.lineHeight
-    });
+        bar.set({
+            left: text.left - padX,
+            top: text.top + text.height - (text.fontSize * text.lineHeight),
+            width: text.width + padX * 2,
+            height: text.fontSize * text.lineHeight
+        });
 
-    group.addWithUpdate();
-    canvas.requestRenderAll();
+        group.addWithUpdate();
+        canvas.requestRenderAll();
+    }, 50);
 }
 
 document.getElementById('addHeadline').addEventListener('click', () => {
