@@ -7,17 +7,20 @@ html, body{
 @font-face {
   font-family: 'Wix Made For Display';
   src: url(/static/fonts/WixMadeforDisplay-ExtraBold.ttf);
-  font-weight: bolder;
+  font-weight: 800; /* ExtraBold */
+  font-style: normal;
 }
 @font-face {
   font-family: 'Wix Made For Display';
   src: url(/static/fonts/WixMadeforDisplay-Bold.ttf);
-  font-weight: bold;
+  font-weight: 700; /* Bold */
+  font-style: normal;
 }
 @font-face {
   font-family: 'Wix Made For Display';
   src: url(/static/fonts/WixMadeforDisplay-SemiBold.ttf);
-  font-weight: normal;
+  font-weight: 600; /* SemiBold */
+  font-style: normal;
 }
 
 

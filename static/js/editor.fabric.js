@@ -1,22 +1,20 @@
-// Initialazie Canvas
+// Initialize Canvas
 const canvas = new fabric.Canvas('editorCanvas', {
     selection: true,
     preserveObjectStacking: true
 });
 
 // CD BASICS
-const FONT_FAMILY = 'Wix Made For Dispaly';
+const FONT_FAMILY = 'Wix Made For Display';
 const COLOR_BLACK = '#000000';
 const COLOR_WHITE = '#ffffff';
 const COLOR_HELLGRUEN = '#c7ff7a';
-// ...
 
 //#region BACKGROUND
 let bgImageObj = null;
 
 function loadBackground(src) {
-    fabric.Image.fromUrl('/static/backgrounds/' + src, (img) => {
-        // Scale Canvas 
+    fabric.Image.fromURL('/static/backgrounds/' + src, (img) => {
         img.set({
             left: 0, top: 0,
             selectable: false,
@@ -25,13 +23,12 @@ function loadBackground(src) {
         img.scaleToWidth(canvas.getWidth());
         img.scaleToHeight(canvas.getHeight());
 
-        if(bgImageObj){
+        if (bgImageObj) {
             canvas.remove(bgImageObj);
         }
         bgImageObj = img;
         canvas.add(bgImageObj);
 
-        // Move BG to bottom layer
         canvas.sendToBack(bgImageObj);
         canvas.requestRenderAll();
     }, { crossOrigin: 'anonymous' });
@@ -41,22 +38,20 @@ function loadBackground(src) {
 document.querySelectorAll('.bg-thumb').forEach(img => {
     img.addEventListener('click', () => {
         loadBackground(img.dataset.src);
-        document.querySelectorAll('.bg-thumg').forEach(i => i.classList.remove('selected'));
+        document.querySelectorAll('.bg-thumb').forEach(i => i.classList.remove('selected'));
         img.classList.add('selected');
     });
 });
 
 // Choose 1st Thumb
 const firstThumb = document.querySelector('.bg-thumb');
-if (firstThumb){
+if (firstThumb) {
     firstThumb.classList.add('selected');
     loadBackground(firstThumb.dataset.src);
 }
 //#endregion
 
 //#region SIDEBAR
-
-// Sidebar Properties
 let selected = null;
 const propBox = document.getElementById('properties');
 
@@ -76,8 +71,7 @@ function addLabelInput(labelText, inputEl) {
 function showProps(obj) {
     propBox.innerHTML = '';
 
-    if(obj.type === 'textbox'){
-        // Text content 
+    if (obj.type === 'textbox') {
         const textInput = document.createElement('input');
         textInput.type = 'text';
         textInput.value = obj.text || '';
@@ -87,83 +81,75 @@ function showProps(obj) {
         });
         addLabelInput("Text:", textInput);
 
-        // Font Size
         const sizeInput = document.createElement('input');
         sizeInput.type = 'number';
         sizeInput.min = '8';
         sizeInput.value = obj.fontSize || 60;
         sizeInput.addEventListener('input', () => {
-            obj.fontSize = Number(sizeInput.vaule || 60);
+            obj.fontSize = Number(sizeInput.value || 60);
             canvas.requestRenderAll();
-            // if headline -> add bg
-            if(obj._isHeadlineChild && obj._parentGroup) {
+            if (obj._isHeadlineChild && obj._parentGroup) {
                 updateHeadlineBar(obj._parentGroup);
             }
         });
         addLabelInput('Schriftgröße:', sizeInput);
 
-        // Color
         const colorInput = document.createElement('input');
         colorInput.type = 'color';
-        colorInput.vaule = toHex(obj.fill || COLOR_BLACK);
+        colorInput.value = toHex(obj.fill || COLOR_BLACK);
         colorInput.addEventListener('input', () => {
-            obj.set({ fill: colorInput.vaule });
+            obj.set({ fill: colorInput.value });
             canvas.requestRenderAll();
         });
         addLabelInput('Farbe:', colorInput);
     }
 
-    // For Headline-Group: Edit Text
-    if (obj.type === 'group' && obj._isHeadlineChild) {
-        const tb = obj._headlineText;   // fabric.Textbox
+    if (obj.type === 'group' && obj._isHeadlineGroup) {
+        const tb = obj._headlineText;
         const textInput = document.createElement('textarea');
         textInput.rows = 3;
         textInput.value = tb.text || 'Headline';
         textInput.addEventListener('input', () => {
-            tb.text = textInputd.vaule;
+            tb.text = textInput.value;
             canvas.requestRenderAll();
             updateHeadlineBar(obj);
         });
         addLabelInput("Headline:", textInput);
 
-        // Size
         const sizeInput = document.createElement('input');
         sizeInput.type = 'number';
         sizeInput.min = '12';
-        sizeInput.vaule = tb.fontSize || 80;
+        sizeInput.value = tb.fontSize || 80;
         sizeInput.addEventListener("input", () => {
-            tb.fontSize = Number(sizeInput.vale || 80);
-            tb.set('lineHeight', 1.3); // Styleguide: Zeilenabstand 1.3× :contentReference[oaicite:3]{index=3}
+            tb.fontSize = Number(sizeInput.value || 80);
+            tb.set('lineHeight', 1.3);
             canvas.requestRenderAll();
             updateHeadlineBar(obj);
         });
         addLabelInput('Schriftgröße:', sizeInput);
 
-        // Bar-color : white / green
         const barSelect = document.createElement('select');
         [['Weiß', COLOR_WHITE], ["Hellgrün", COLOR_HELLGRUEN]].forEach(([label, val]) => {
             const opt = document.createElement('option');
-            opt.vaule = val; opt.textContent = label;
+            opt.value = val; opt.textContent = label;
             barSelect.appendChild(opt);
         });
-        barSelect.vaule = obj._barRect.fill || COLOR_HELLGRUEN;
+        barSelect.value = obj._barRect.fill || COLOR_HELLGRUEN;
         barSelect.addEventListener('change', () => {
-            obj._barRect.set('fill', barSelect.vaule);
+            obj._barRect.set('fill', barSelect.value);
             canvas.requestRenderAll();
         });
-        addLabelInput('Balckenfarbe:', barSelect);
+        addLabelInput('Balkenfarbe:', barSelect);
     }
 }
-
 //#endregion
 
-function toHex(color){
+function toHex(color) {
     const ctx = document.createElement('canvas').getContext('2d');
     ctx.fillStyle = color;
     return ctx.fillStyle;
 }
 
-// Select obj and show Properties
 canvas.on('selection:cleared', () => {
     selected = null;
     clearProps();
@@ -177,12 +163,9 @@ canvas.on('selection:updated', (e) => {
     if (selected) showProps(selected);
 });
 
-
-//#region Add TEXT
-
-// 'Free' Text
+//#region ADD TEXT
 document.getElementById('addText').addEventListener('click', () => {
-    const tb = new fabric.TextBox('Dein Text', {
+    const tb = new fabric.Textbox('Dein Text', {
         left: 50, top: 50,
         fontSize: 60,
         fontFamily: FONT_FAMILY,
@@ -191,15 +174,16 @@ document.getElementById('addText').addEventListener('click', () => {
     });
     canvas.add(tb).setActiveObject(tb);
     canvas.requestRenderAll();
-    showProps(tb); 
+    showProps(tb);
 });
 
-// Headline Text with Bar according to CD
-function createHeadlineGroup() {
+ function createHeadlineGroup() {
     const fontSize = 80;
     const lineHeight = 1.3;
-    const text = new farbic.Textbox('Headline', {
-        left: 0, Top: 0,
+    const padX = 20;
+
+    const text = new fabric.Textbox('Headline', {
+        left: 0, top: 0,
         fontSize,
         lineHeight,
         fontFamily: FONT_FAMILY,
@@ -208,25 +192,21 @@ function createHeadlineGroup() {
         editable: true
     });
 
-    // bar: Height = Zeilenabstand ≈ fontSize * 1.3, Länge = Textbreite + Polster
-    const padX = 20; // Space left/right
     const bar = new fabric.Rect({
         left: -padX,
         top: (text.top + text.height - (fontSize * lineHeight)),
         width: text.width + padX * 2,
         height: fontSize * lineHeight,
         fill: COLOR_HELLGRUEN,
-        rx: 0, ry: 0,
         selectable: false,
         evented: false
     });
 
-    // Groud-order
-    const group = new farbic.Group([bar, text], {
+    const group = new fabric.Group([bar, text], {
         left: 50, top: 150
     });
 
-    group._isHeadlineChild = true;
+    group._isHeadlineGroup = true;
     group._headlineText = text;
     group._barRect = bar;
     text._isHeadlineChild = true;
@@ -235,13 +215,12 @@ function createHeadlineGroup() {
     return group;
 }
 
-function updateHeadlineBar(group){
+function updateHeadlineBar(group) {
     const text = group._headlineText;
-    const bar = group._barRectl;
+    const bar = group._barRect;
     const padX = 20;
 
-    // calc pos and size 
-    text.set({ width: undefined }); // let it recallibrate
+    text.set({ width: undefined });
     text.initDimensions();
 
     bar.set({
@@ -265,19 +244,18 @@ document.getElementById('addHeadline').addEventListener('click', () => {
 
 //#region EXPORT
 document.getElementById('export').addEventListener('click', async () => {
-    //ensure bg is at the back
-    if(bgImageObj) canvas.sendToBack(bgImageObj);
+    if (bgImageObj) canvas.sendToBack(bgImageObj);
     canvas.discardActiveObject();
     canvas.requestRenderAll();
 
     const dataURL = canvas.toDataURL({ format: 'png', enableRetinaScaling: true });
     const res = await fetch('/export', {
         method: 'POST',
-        headers: { 'Content-Type': "applications/json" },
+        headers: { 'Content-Type': "application/json" },
         body: JSON.stringify({ dataURL })
     });
     const json = await res.json();
-    if(json.url) {
+    if (json.url) {
         window.location.href = json.url;
     } else {
         alert('Export fehlgeschlagen.');
