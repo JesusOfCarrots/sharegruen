@@ -239,20 +239,19 @@ function updateHeadlineBar(group) {
     const bar = group._barRect;
     const padX = 20;
 
-    setTimeout(() => {
-        text.initDimensions();
-        const textBounds = text.getBoundingRect(true);
+    text.initDimensions();
+    const textWidth = text.width;
+    const textHeight = text.fontSize * text.lineHeight;
 
-        bar.set({
-            left: textBounds.left - padX,
-            top: text.top + text.height - (text.fontSize * text.lineHeight),
-            width: text.width + padX * 2,
-            height: text.fontSize * text.lineHeight
-        });
+    bar.set({
+        left: text.left - padX,
+        top: text.top + text.height - textHeight,
+        width: textWidth + padX * 2,
+        height: textHeight
+    });
 
-        group.addWithUpdate();
-        canvas.requestRenderAll();
-    }, 50); 
+    group.addWithUpdate();
+    canvas.requestRenderAll();
 }
 
 document.getElementById('addHeadline').addEventListener('click', () => {
