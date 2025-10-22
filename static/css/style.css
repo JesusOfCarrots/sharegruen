@@ -23,6 +23,49 @@ html, body{
   font-style: normal;
 }
 
+/** Alter BOX **/
+/* The dark overlay behind the modal */
+#overlay {
+  position: fixed; /* stays on screen even when scrolling */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* dim background */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* make sure it’s above everything else */
+}
+
+/* The modal itself */
+#modalbox {
+  width: 80%;
+  max-width: 450px;
+  text-align: center;
+  padding: 80px 60px;
+  font-size: 22px;
+  font-weight: 600;
+  background-color: beige;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+#modalbox button {
+  background-color: #33c270;
+  color: #fff;
+  padding: 15px 0;
+  border-radius: 4px;
+  font-size: 20px;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  margin-top: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+
 
 
 body {

@@ -225,6 +225,10 @@ document.getElementById('addText').addEventListener('click', () => {
     text._isHeadlineChild = true;
     text._parentGroup = group;
 
+    text.on('changed', () => updateHeadlineBar(group));
+    text.on('modified', () => updateHeadlineBar(group));
+    group.on('scaled',   () => updateHeadlineBar(group))
+
     // ensure correct Bar size after fonts loaded
     document.fonts.ready.then(() => {
         updateHeadlineBar(group);
@@ -247,7 +251,8 @@ function updateHeadlineBar(group) {
         left: text.left - padX,
         top: text.top + text.height - textHeight,
         width: textWidth + padX * 2,
-        height: textHeight
+        height: textHeight,
+        visible: true
     });
 
     group.addWithUpdate();

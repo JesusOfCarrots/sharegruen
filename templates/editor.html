@@ -8,7 +8,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
 </head>
-<body>
+<body onload="showModal()">
     <div class="toolbar">
         <label for="bgSelect">Hitergrund:</label>
         <div class="bg-options">
@@ -50,9 +50,29 @@
         </div>
     </div>
 
+
+
+    <div id="overlay">
+    <div id="modalbox">
+        <p>Herzlich willkommen zum Sharepic generator der GRÜNEN JUGEND. <br> Ein Projekt mit <img src="/static/img/heart-icon.svg" width="24px" height="24px" style="margin-top: 50px; vertical-align: -6px;"> von Mel :) </p>
+        <button type="button" onclick="closeModal()">Okayy.</button>
+    </div>
+    </div>
+
     <script>
         const W = {{width}};
         const H = {{height}};
+    </script>
+    <script>
+        function showModal() {
+        setTimeout(() => {
+            document.getElementById('overlay').style.display = 'flex';
+        }, 700);
+        }
+
+        function closeModal() {
+        document.getElementById('overlay').style.display = 'none';
+        }
     </script>
     <script src="/static/js/editor.fabric.js"></script>
 </body>
