@@ -241,8 +241,8 @@ function updateHeadlineBar(group) {
 
     setTimeout(() => {
         text.initDimensions();
+        const textBounds = text.getBoundingRect(true);
 
-        console.log(text.top, text.height , (text.fontSize * text.lineHeight));
         bar.set({
             left: textBounds.left - padX,
             top: text.top + text.height - (text.fontSize * text.lineHeight),
