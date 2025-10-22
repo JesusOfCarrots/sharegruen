@@ -2,8 +2,7 @@
 const canvas = new fabric.Canvas('editorCanvas', {
     selection: true,
     preserveObjectStacking: true
-});
-
+    });
 
 // CD BASICS
 const FONT_FAMILY = 'Wix Made For Display';
@@ -266,6 +265,30 @@ document.getElementById('addHeadline').addEventListener('click', () => {
     showProps(group);
 });
 //#endregion
+
+
+//#region  KV LOGO
+function addKVLogo(kvName){
+    const url = `/kvlogo/${encodeURIComponent(kvName)}`;
+
+    fabric.loadSVGFromURL(url, (objects, options) => {
+        const logo = fabric.util.groupSVGElements(objects, options);
+        const scale = (W * 0.25) / logo.width; // 25% of the canvas width
+
+        logo.set({
+            left: 40,
+            top: H - logo.height * scale - 40,
+            sclaeX: scale,
+            sclaeY: scale,
+            selectable: false,
+            evented: false
+        });
+        
+        canvas.add(logo);
+        canvas.sendToBack(logo);
+        canvas.requestRenderAll();
+    });
+}
 
 //#region EXPORT
 document.getElementById('export').addEventListener('click', async () => {

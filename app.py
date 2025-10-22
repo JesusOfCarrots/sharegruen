@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_from_directory, jsonify
+from flask import Flask, render_template, request, send_from_directory, jsonify, Response
 import os, re, base64
 from datetime import datetime
 
@@ -58,6 +58,22 @@ def uploaded_file(filename):
 @app.route('/downloads/<path:filename>')
 def download_file(filename):
     return send_from_directory(UPLOAD_DIR, filename, as_attachment=True)
+
+# Make custom KV Logo
+@app.route("/kvlogo/<kv>")
+def kv_logo(kv):
+    kv_text = kv.strip().upper()
+    with open("static/logo_template.svg", "r", encoding="utf-8") as f:
+        svg = f.read()
+
+    svg = re.sub(
+        r'(<tspan[^>]*>)(.*?)(</tspan>)',
+        rf'\1{kv_text}\3',
+        svg,
+        count=1 
+    )
+
+    return Response(svg, mimetype="image/svg+xml")
 
 if __name__ == '__main__':
     app.run(debug=True)

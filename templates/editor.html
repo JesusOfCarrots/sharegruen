@@ -33,6 +33,10 @@
 
         </div>
 
+        <label for="kvInput">Kreisverband:</label>
+        <input type="text" id="kvInput" placeholder="Duisburg">
+        <button id="setKV">Logo einfügen</button>
+
         <button id="addText">Text hinzufuegen</button>
         <button id="addHeadline">Headline mit CD-Hinterlegung</button>
         <button id="export">Exportieren (PNG)</button>
@@ -73,6 +77,11 @@
         function closeModal() {
         document.getElementById('overlay').style.display = 'none';
         }
+
+        document.getElementById("setKV").addEventListener('click', () => {
+            const kv = document.getElementById('kvInput').value.trim();
+            if (kv) addKVLogo(kv);
+        });
     </script>
     <script src="/static/js/editor.fabric.js"></script>
 </body>
