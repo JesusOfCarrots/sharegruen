@@ -84,7 +84,7 @@ function showProps(obj) {
     propBox.innerHTML = '';
 
     // POS 
-    if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox) {
+    if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox || obj instanceof fabric.Image) {
         // X
         const xInput = document.createElement('input');
         xInput.type = 'number';
@@ -432,6 +432,61 @@ function addPictogramToCanvas(url) {
 
 //#endregion
 
+
+//#region Upload image
+const uploadInput = document.getElementById('imgUploadInput');
+const uploadBtn = document.getElementById('addImg');
+
+uploadBtn.addEventListener('click', () => { uploadInput.click(); });
+
+// upload to server
+uploadInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const res = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const json = await res.json();
+        if(json.url) {
+            addUploadedImageToCanvas(json.url);
+        } else{
+            alert('Upload fehlgeschlagen.');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Fehler beim Hochladen');
+    }
+
+    // reset Input
+    uploadInput.value = '';
+});
+
+function addUploadedImageToCanvas(url){
+    fabric.Image.fromURL(url, (img) => {
+        const maxWidth = W * 0.6;
+        const scale = Math.min(maxWidth / img.width, 1);
+
+        img.set({
+            left: W / 2 - (img.width * scale) / 2,
+            top: H / 2 - (img.height * scale) / 2,
+            scaleX: scale,
+            scaleY: scale,
+            selectable: true,
+            evented: true
+        });
+
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        canvas.requestRenderAll();
+    }, { crossOrigin: 'anonymous' });
+}
 
 // Delete selected object
 document.onkeydown = function(e) {

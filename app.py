@@ -81,5 +81,6 @@ def list_piktogramme():
     files = [f for f in os.listdir(picto_dir) if f.lower().endswith(".svg")]
     return jsonify(files)
 
+
 if __name__ == '__main__':
     app.run(debug=True)

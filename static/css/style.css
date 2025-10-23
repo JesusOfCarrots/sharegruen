@@ -16,7 +16,7 @@
   font-weight: 600; /* SemiBold */
   font-style: normal;
 }
-
+button, a {transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;}
 html, body{
   margin: 0;
   padding: 0;
@@ -159,6 +159,7 @@ header button {
   cursor: pointer;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
 }
+header button:hover{padding: 7px; opacity: 0.83;}
 
 
 .bg-options {

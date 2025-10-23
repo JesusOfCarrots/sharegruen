@@ -3,7 +3,6 @@
 - KV Icon Color
 - No new lines in properties Tex textbox (simple Text)
 - del Logo if already exists
-- pos
 
 (- whut is folder 'uploads')
 
