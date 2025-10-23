@@ -1,9 +1,9 @@
 - issue with Headline bar sacing (loading)
 - issue with scaling the text from the Headline 
 - KV Icon Color
-- Piktogramme (resize, color)
 - No new lines in properties Tex textbox (simple Text)
 - del Logo if already exists
+- pos
 
 (- whut is folder 'uploads')
 
