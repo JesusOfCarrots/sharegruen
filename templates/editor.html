@@ -39,6 +39,7 @@
 
         <button id="addText">Text hinzufuegen</button>
         <button id="addHeadline">Headline mit CD-Hinterlegung</button>
+        <button id="addPicto" onclick="piktogramme()">Pictogram Hinzuügen</button>
         <button id="export">Exportieren (PNG)</button>
     </div>
 
@@ -54,13 +55,21 @@
         </div>
     </div>
 
+    <div id="picto-overlay">
+        <div id="picto-select-screen">
+            <h2>Piktogramme auswählen</h2>
+            <input type="text" id="pictoSearch" placeholder="Suche...">
+            <div id="pictoGrid"></div>
+            <button onclick="closePicto()">Schließen</button>
+        </div>
+    </div>
 
 
     <div id="overlay">
-    <div id="modalbox">
-        <p>Herzlich willkommen zum Sharepic generator der GRÜNEN JUGEND. <br> Ein Projekt mit <img src="/static/img/heart-icon.svg" width="24px" height="24px" style="margin-top: 50px; vertical-align: -6px;"> von Mel :) </p>
-        <button type="button" onclick="closeModal()">Okayy.</button>
-    </div>
+        <div id="modalbox">
+            <p>Herzlich willkommen zum Sharepic generator der GRÜNEN JUGEND. <br> Ein Projekt mit <img src="/static/img/heart-icon.svg" width="24px" height="24px" style="margin-top: 50px; vertical-align: -6px;"> von Mel :) </p>
+            <button type="button" onclick="closeModal()">Okayy.</button>
+        </div>
     </div>
 
     <script>
@@ -85,6 +94,7 @@
             const kv = document.getElementById('kvInput').value.trim();
             if (kv) addKVLogo(kv);
         });
+
     </script>
     <script src="/static/js/editor.fabric.js"></script>
 </body>

@@ -308,6 +308,74 @@ function addKVLogo(kvName) {
 }
 
 
+//#region Pictogramme 
+async function piktogramme() {
+    const overlay = document.getElementById("picto-overlay");
+    const grid = document.getElementById("pictoGrid");
+    const search = document.getElementById("pictoSearch");
+  
+    overlay.style.display = 'flex';
+    grid.innerHTML = '<p>Lade...</p>';
+  
+    // get all pictos
+    const res = await fetch('/piktogramme');
+    const files = await res.json();
+  
+    renderPictos(files);
+  
+    // Filter search
+    search.addEventListener('input', () => {
+      const term = search.value.toLowerCase();
+      const filtered = files.filter(f => f.toLowerCase().includes(term));
+      renderPictos(filtered);
+    });
+  
+    function renderPictos(list) {
+      grid.innerHTML = '';
+      list.forEach(filename => {
+        const div = document.createElement('div');
+        div.className = 'picto-item';
+        div.innerHTML = `
+          <img src="/static/piktogramme/${filename}" alt="${filename}">
+          <span>${filename.replace('.svg', '')}</span>
+        `;
+        div.addEventListener('click', () => {
+          addPictogramToCanvas(`/static/piktogramme/${filename}`);
+          overlay.style.display = 'none';
+        });
+        grid.appendChild(div);
+      });
+    }
+  }
+  
+  function closePicto() {
+    document.getElementById("picto-overlay").style.display = 'none';
+  }
+  
+// add svg to canvas
+function addPictogramToCanvas(url) {
+    fabric.loadSVGFromURL(url, (objects, options) => {
+      const svg = fabric.util.groupSVGElements(objects, options);
+      const scale = 0.5;
+  
+      svg.set({
+        left: W / 2 - (svg.width * scale) / 2,
+        top: H / 2 - (svg.height * scale) / 2,
+        scaleX: scale,
+        scaleY: scale,
+        selectable: true,
+        evented: true
+      });
+  
+      canvas.add(svg);
+      canvas.setActiveObject(svg);
+      canvas.requestRenderAll();
+    });
+}
+
+//#endregion
+
+
 //#region EXPORT
 document.getElementById('export').addEventListener('click', async () => {
     if (bgImageObj) canvas.sendToBack(bgImageObj);

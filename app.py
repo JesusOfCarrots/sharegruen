@@ -75,5 +75,11 @@ def kv_logo(kv):
 
     return Response(svg, mimetype="image/svg+xml")
 
+@app.route("/piktogramme")
+def list_piktogramme():
+    picto_dir = os.path.join(app.static_folder, "piktogramme")
+    files = [f for f in os.listdir(picto_dir) if f.lower().endswith(".svg")]
+    return jsonify(files)
+
 if __name__ == '__main__':
     app.run(debug=True)
