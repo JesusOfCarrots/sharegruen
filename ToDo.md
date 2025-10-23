@@ -1,7 +1,7 @@
 - issue with Headline bar sacing (loading)
 - issue with scaling the text from the Headline 
 - KV Icon Color
-- Piktogramme
+- Piktogramme (resize, color)
 - No new lines in properties Tex textbox (simple Text)
 
 ::
