@@ -195,7 +195,7 @@ canvas.on('selection:updated', (e) => {
 //#region ADD TEXT
 document.getElementById('addText').addEventListener('click', () => {
     const tb = new fabric.Textbox('Dein Text', {
-        left: 50, top: 50,
+        left: 68, top: 540,
         fontSize: 60,
         fontFamily: FONT_FAMILY,
         fill: COLOR_BLACK,
@@ -207,15 +207,15 @@ document.getElementById('addText').addEventListener('click', () => {
 });
 
 function createHeadlineGroup() {
-    const fontSize = 80;
+    const fontSize = 90;
     const lineHeight = 1.3;
     const padX = 20;
 
 
     const text = new fabric.Textbox('', {
-        left: 0, top: 0,
+        left: 68 - (padX *2 + 2), top: 0,
         fontSize,
-        lineHeight,
+        lineHeight: lineHeight,
         fontFamily: FONT_FAMILY,
         fontWeight: 800,
         fill: COLOR_BLACK,
@@ -376,8 +376,10 @@ function addPictogramToCanvas(url) {
         const scale = 2;
   
         svg.set({
-            left: W / 2 - (svg.width * scale) / 2,
-            top: H / 2 - (svg.height * scale) / 2,
+            //left: W / 2 - (svg.width * scale) / 2,
+            left: 620,
+            //top: H / 2 - (svg.height * scale) / 2,
+            top: 742,
             scaleX: scale,
             scaleY: scale,
             selectable: true,
