@@ -153,6 +153,23 @@ function showProps(obj) {
         });
         addLabelInput('Balkenfarbe:', barSelect);
     }
+
+    // SVG Color
+    if (obj._fromSVG) { 
+        const svgColor = document.createElement('input'); 
+        svgColor.type = 'color'; 
+
+        svgColor.value = toHex(COLOR_BLACK); 
+        svgColor.addEventListener('input', () => { 
+            for (var i = 0; i < obj._objects.length; i++) {
+                obj._objects[i].set({
+                    fill: svgColor.value
+                });
+        }
+        canvas.requestRenderAll();
+        }); 
+        addLabelInput('Farbe:', svgColor);
+    }
 }
 //#endregion
 
@@ -275,9 +292,9 @@ document.getElementById('addHeadline').addEventListener('click', () => {
 
 //#region  KV LOGO
 function addKVLogo(kvName) {
-  const url = `/kvlogo/${encodeURIComponent(kvName)}`;
+    const url = `/kvlogo/${encodeURIComponent(kvName)}`;
 
-  fabric.loadSVGFromURL(url, (objects, options) => {
+    fabric.loadSVGFromURL(url, (objects, options) => {
     // Gruppe aus SVG-Objekten bilden
     const logo = fabric.util.groupSVGElements(objects, options);
 
@@ -355,25 +372,37 @@ async function piktogramme() {
 // add svg to canvas
 function addPictogramToCanvas(url) {
     fabric.loadSVGFromURL(url, (objects, options) => {
-      const svg = fabric.util.groupSVGElements(objects, options);
-      const scale = 0.5;
+        const svg = fabric.util.groupSVGElements(objects, options);
+        const scale = 2;
   
-      svg.set({
-        left: W / 2 - (svg.width * scale) / 2,
-        top: H / 2 - (svg.height * scale) / 2,
-        scaleX: scale,
-        scaleY: scale,
-        selectable: true,
-        evented: true
-      });
-  
-      canvas.add(svg);
-      canvas.setActiveObject(svg);
-      canvas.requestRenderAll();
+        svg.set({
+            left: W / 2 - (svg.width * scale) / 2,
+            top: H / 2 - (svg.height * scale) / 2,
+            scaleX: scale,
+            scaleY: scale,
+            selectable: true,
+            evented: true
+        });
+
+        svg._fromSVG = true;
+
+        canvas.add(svg);
+        canvas.setActiveObject(svg);
+        canvas.requestRenderAll();
     });
 }
 
 //#endregion
+
+
+// Delete selected object
+document.onkeydown = function(e) {
+    switch (e.keyCode) {
+      case 46: // delete
+        canvas.remove(canvas.getActiveObject());
+    }
+}
+
 
 
 //#region EXPORT
