@@ -63,6 +63,7 @@ def download_file(filename):
 @app.route("/kvlogo/<kv>")
 def kv_logo(kv):
     kv_text = kv.strip().upper()
+
     with open("static/logo_template.svg", "r", encoding="utf-8") as f:
         svg = f.read()
 

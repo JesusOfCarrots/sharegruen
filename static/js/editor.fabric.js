@@ -4,7 +4,7 @@ const canvas = new fabric.Canvas('editorCanvas', {
     preserveObjectStacking: true
 });
 
-// CD BASICS
+//#region CD BASICS
 const FONT_FAMILY = 'Wix Made For Display';
 const COLOR_BLACK = '#000000';
 const COLOR_WHITE = '#ffffff';
@@ -14,12 +14,22 @@ const COLOR_PINK = '#f28ade';
 const COLOR_ORANGE = '#ff8568';
 const COLOR_DUNKELGRUEN = '#33c270';
 
+// Map of dark and bright bgs for Logo 
+const DARK_BACKGROUNDS = [
+    'GJ_dunkelGruen.png',
+    'GJ_Lila.png',
+    'GJ_Orange.png',
+    'GJ_Pink.png'
+];
+
 
 //#region BACKGROUND
 let bgImageObj = null;
 
 function loadBackground(src) {
-    fabric.Image.fromURL('/static/backgrounds/' + src, (img) => {
+    const imgURL = '/static/backgrounds/' + src;
+
+    fabric.Image.fromURL(imgURL, (img) => {
         const cw = canvas.getWidth();
         const ch = canvas.getHeight();
         const scale = Math.max(cw / img.width, ch / img.height);
@@ -38,11 +48,17 @@ function loadBackground(src) {
         if (bgImageObj) {
             canvas.remove(bgImageObj);
         }
+        img._bgSrc = src;
+        
         bgImageObj = img;
         canvas.add(bgImageObj);
-
         canvas.sendToBack(bgImageObj);
         canvas.requestRenderAll();
+
+        const isDark = DARK_BACKGROUNDS.includes(src);
+        const variant = isDark ? 'light' : 'dark';
+        updateKVLogoVariant(variant);
+
     }, { crossOrigin: 'anonymous' });
 }
 
@@ -338,6 +354,7 @@ function addKVLogo(kvName) {
     const logo = fabric.util.groupSVGElements(objects, options);
 
     logo._isKVLogo = true;
+    logo._kvName = kvName; // for when reloading it because auf bg
     // Erst einmal korrekt zusammenfassen
     logo.set({
       originX: 'left',
@@ -361,8 +378,62 @@ function addKVLogo(kvName) {
     canvas.add(logo);
     canvas.bringToFront(logo);
     canvas.requestRenderAll();
+
+    // correct logo color
+    if (bgImageObj && bgImageObj._bgSrc) {
+        const isDark = DARK_BACKGROUNDS.includes(bgImageObj._bgSrc);
+        const variant = isDark ? 'light' : 'dark';
+        updateKVLogoVariant(variant);
+    }
   });
 }
+
+function updateKVLogoVariant(variant) {
+    const existingLogo = canvas.getObjects().find(o => o._isKVLogo);
+    if (!existingLogo || !existingLogo._kvName) return;
+
+    const kvName = existingLogo._kvName;
+
+    // Altes Logo entfernen
+    canvas.remove(existingLogo);
+
+    // Neues Logo laden
+    const url = `/kvlogo/${encodeURIComponent(kvName)}`;
+    fabric.loadSVGFromURL(url, (objects, options) => {
+        const logo = fabric.util.groupSVGElements(objects, options);
+        logo._isKVLogo = true;
+        logo._kvName = kvName;
+
+        // Variante auswerten
+        const fillColor = variant === "dark" ? COLOR_BLACK : COLOR_HELLGRUEN; // Weiß oder GJ-Grün
+
+        // Alle Unterobjekte einfärben
+        logo.getObjects().forEach(o => {
+            if (o.fill) o.set({ fill: fillColor });
+            if (o.stroke) o.set({ stroke: fillColor });
+        });
+
+        // Größe und Position
+        const desiredWidth = W * 0.3;
+        const scale = desiredWidth / logo.width;
+        logo.scale(scale);
+
+        logo.set({
+            originX: "left",
+            originY: "bottom",
+            left: 40,
+            top: H - 40,
+            selectable: false,
+            evented: false
+        });
+
+        // In Canvas einfügen
+        canvas.add(logo);
+        canvas.bringToFront(logo);
+        canvas.requestRenderAll();
+    });
+}
+
 //#endregion
 
 
