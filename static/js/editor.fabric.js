@@ -83,6 +83,42 @@ function addLabelInput(labelText, inputEl) {
 function showProps(obj) {
     propBox.innerHTML = '';
 
+    // POS 
+    if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox) {
+        // X
+        const xInput = document.createElement('input');
+        xInput.type = 'number';
+        xInput.value = Math.round(obj.left || 0);
+        xInput.style.width = '80px';
+        xInput.addEventListener('input', () => {
+            obj.set({ left: parseFloat(xInput.value) });
+            obj.setCoords();
+            canvas.requestRenderAll();
+        });
+
+        // Y
+        const yInput = document.createElement('input');
+        yInput.type = 'number';
+        yInput.value = Math.round(obj.top || 0);
+        yInput.style.width = '80px';
+        yInput.addEventListener('input', () => {
+            obj.set({ top: parseFloat(yInput.value) });
+            obj.setCoords();
+            canvas.requestRenderAll();
+        });
+
+        // Add labels
+        addLabelInput('Abstand von links (X)', xInput);
+        addLabelInput('Abstand von links (Y)', yInput);
+
+        // refresh 
+        obj.on('moving', () => {
+            xInput.value = Math.round(obj.left);
+            yInput.value = Math.round(obj.top);
+        });
+    }
+
+
     if (obj.type === 'textbox') {
         const textInput = document.createElement('input');
         textInput.type = 'text';
@@ -155,7 +191,7 @@ function showProps(obj) {
     }
 
     // SVG Color
-    if (obj._fromSVG) { 
+    if (obj._isPictogram) { 
         const svgColor = document.createElement('input'); 
         svgColor.type = 'color'; 
 
@@ -386,7 +422,7 @@ function addPictogramToCanvas(url) {
             evented: true
         });
 
-        svg._fromSVG = true;
+        svg._isPictogram = true;
 
         canvas.add(svg);
         canvas.setActiveObject(svg);
