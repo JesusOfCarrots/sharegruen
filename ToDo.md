@@ -2,7 +2,6 @@
 - issue with scaling the text from the Headline 
 - KV Icon Color
 - No new lines in properties Tex textbox (simple Text)
-- del Logo if already exists
 
 (- whut is folder 'uploads')
 

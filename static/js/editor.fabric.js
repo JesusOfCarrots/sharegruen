@@ -330,10 +330,14 @@ document.getElementById('addHeadline').addEventListener('click', () => {
 function addKVLogo(kvName) {
     const url = `/kvlogo/${encodeURIComponent(kvName)}`;
 
+    const existing = canvas.getObjects().find(o => o._isKVLogo);
+    if(existing) canvas.remove(existing);
+
     fabric.loadSVGFromURL(url, (objects, options) => {
     // Gruppe aus SVG-Objekten bilden
     const logo = fabric.util.groupSVGElements(objects, options);
 
+    logo._isKVLogo = true;
     // Erst einmal korrekt zusammenfassen
     logo.set({
       originX: 'left',
@@ -359,6 +363,7 @@ function addKVLogo(kvName) {
     canvas.requestRenderAll();
   });
 }
+//#endregion
 
 
 //#region Pictogramme 
@@ -487,6 +492,8 @@ function addUploadedImageToCanvas(url){
         canvas.requestRenderAll();
     }, { crossOrigin: 'anonymous' });
 }
+
+//#endregion
 
 // Delete selected object
 document.onkeydown = function(e) {
