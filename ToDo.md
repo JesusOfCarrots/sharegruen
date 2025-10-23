@@ -1,6 +1,6 @@
 - issue with Headline bar sacing (loading)
 - issue with scaling the text from the Headline 
-- KV Icon
+- KV Icon Color
 - Piktogramme
 
 ::

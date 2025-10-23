@@ -268,27 +268,39 @@ document.getElementById('addHeadline').addEventListener('click', () => {
 
 
 //#region  KV LOGO
-function addKVLogo(kvName){
-    const url = `/kvlogo/${encodeURIComponent(kvName)}`;
+function addKVLogo(kvName) {
+  const url = `/kvlogo/${encodeURIComponent(kvName)}`;
 
-    fabric.loadSVGFromURL(url, (objects, options) => {
-        const logo = fabric.util.groupSVGElements(objects, options);
-        const scale = (W * 0.25) / logo.width; // 25% of the canvas width
+  fabric.loadSVGFromURL(url, (objects, options) => {
+    // Gruppe aus SVG-Objekten bilden
+    const logo = fabric.util.groupSVGElements(objects, options);
 
-        logo.set({
-            left: 40,
-            top: H - logo.height * scale - 40,
-            sclaeX: scale,
-            sclaeY: scale,
-            selectable: false,
-            evented: false
-        });
-        
-        canvas.add(logo);
-        canvas.sendToBack(logo);
-        canvas.requestRenderAll();
+    // Erst einmal korrekt zusammenfassen
+    logo.set({
+      originX: 'left',
+      originY: 'bottom'
     });
+
+    const desiredWidth = W * 0.3;
+    const scale = desiredWidth / logo.width;
+
+    logo.scale(scale);
+
+    // Position: unten links mit 40px Abstand
+    logo.set({
+      left: 40,
+      top: H - 40, // Position von unten
+      selectable: false,
+      evented: false
+    });
+
+    // In Canvas einfügen
+    canvas.add(logo);
+    canvas.bringToFront(logo);
+    canvas.requestRenderAll();
+  });
 }
+
 
 //#region EXPORT
 document.getElementById('export').addEventListener('click', async () => {
