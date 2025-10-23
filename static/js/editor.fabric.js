@@ -2,7 +2,7 @@
 const canvas = new fabric.Canvas('editorCanvas', {
     selection: true,
     preserveObjectStacking: true
-    });
+});
 
 // CD BASICS
 const FONT_FAMILY = 'Wix Made For Display';
@@ -120,7 +120,7 @@ function showProps(obj) {
         const tb = obj._headlineText;
         const textInput = document.createElement('textarea');
         textInput.rows = 3;
-        textInput.value = tb.text || 'Headline';
+        textInput.value = tb.text || '';
         textInput.addEventListener('input', () => {
             tb.text = textInput.value;
             canvas.requestRenderAll();
@@ -189,12 +189,13 @@ document.getElementById('addText').addEventListener('click', () => {
     showProps(tb);
 });
 
- function createHeadlineGroup() {
+function createHeadlineGroup() {
     const fontSize = 80;
     const lineHeight = 1.3;
     const padX = 20;
 
-    const text = new fabric.Textbox('Headline', {
+
+    const text = new fabric.Textbox('', {
         left: 0, top: 0,
         fontSize,
         lineHeight,
@@ -204,9 +205,11 @@ document.getElementById('addText').addEventListener('click', () => {
         editable: true
     });
 
+    text.initDimensions();
+
     const bar = new fabric.Rect({
         left: -padX,
-        top: (text.top + text.height - (fontSize * lineHeight)),
+        top: text.top + text.height - text.fontSize * lineHeight,
         width: text.width + padX * 2,
         height: fontSize * lineHeight,
         fill: COLOR_HELLGRUEN,
@@ -214,8 +217,10 @@ document.getElementById('addText').addEventListener('click', () => {
         evented: false
     });
 
+    
+
     const group = new fabric.Group([bar, text], {
-        left: 50, top: 150
+        left: 50, top: 150,
     });
 
     group._isHeadlineGroup = true;
@@ -248,7 +253,8 @@ function updateHeadlineBar(group) {
 
     bar.set({
         left: text.left - padX,
-        top: text.top + text.height - textHeight,
+        top: text.top + (text.height - textHeight) / 2 - 2,
+        //top: text.top + text.height - textHeight,
         width: textWidth + padX * 2,
         height: textHeight,
         visible: true
