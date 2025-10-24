@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify, Response
 import os, re, base64
 from datetime import datetime
-import shutil
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 UPLOAD_DIR = 'uploads'
@@ -13,6 +12,7 @@ FORMATS = {
     "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
 }
 
+MAX_FILE_AGE = 60 * 60 * 24    # 24h
 
 
 @app.route('/')
@@ -59,18 +59,6 @@ def uploaded_file(filename):
 @app.route('/downloads/<path:filename>')
 def download_file(filename):
     return send_from_directory(UPLOAD_DIR, filename, as_attachment=True)
-
-
-# clean up UPLAOD_DIR folder 
-@app.route('/cleanup', methods=['POST'])
-def cleanup():
-    for filename in os.listdir(UPLOAD_DIR):
-        file_path = os.path.join(UPLOAD_DIR, filename)
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            print(f"Fehler beim Löschen {file_path}: {e}")
-    return '', 204
 
 # Make custom KV Logo
 @app.route("/kvlogo/<kv>")
