@@ -4,4 +4,18 @@
 Ein Sharepic Generator im CD der Grünen Jugend ab 2024.
 
 Weiteres folgt.
-ToDo  folgt.
+
+
+# ToDo
+- issue with Headline bar sacing (loading)
+- issue with scaling the text from the Headline 
+- No new lines in properties Tex textbox (simple Text)
+- cleanup folder 'uploads'
+
+
+# Donation
+
+If you like my Work and want to support me you can **Donate** me.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L3R7VCE)
+
