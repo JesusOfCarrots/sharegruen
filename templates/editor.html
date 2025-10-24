@@ -96,7 +96,13 @@
 
     <div id="overlay">
         <div id="modalbox">
-            <p>Herzlich willkommen zum Sharepic generator der GRÜNEN JUGEND. <br> Ein Projekt mit <img src="/static/img/heart-icon.svg" width="24px" height="24px" style="margin-top: 50px; vertical-align: -6px;"> von Mel :) </p>
+            <h3 style="margin-top: 0;">Herzlich willkommen zum Sharepic generator der GRÜNEN JUGEND. </h3>
+            <p>
+                ACHTUNG: Dieses Projekt ist keineswegs fertig. Es befindet sich noch mitten in der Entwicklung. Seit also bitte etwas nachsichtig (: <br>
+                Den Source code, sowie die Projektdateien und die ToDo liste findet ihr (bald) unter diesem link:
+                <a href="https://github.com/JesusOfCarrots/sharegruen">https://github.com/JesusOfCarrots/sharegruen</a>
+            </p>
+            <p>Ein Projekt mit <img src="/static/img/heart-icon.svg" width="24px" height="24px" style="margin-top: 50px; vertical-align: -6px;"> von Mel :) </p>
             <button type="button" onclick="closeModal()">Okayy.</button>
         </div>
     </div>
@@ -106,7 +112,7 @@
         const H = {{height}};
     </script>
     <script>
-        let showBox = false;
+        let showBox = true;
         if(showBox){
             function showModal() {
                 setTimeout(() => {

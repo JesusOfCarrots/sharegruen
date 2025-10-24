@@ -47,7 +47,7 @@ body {
 /* The modal itself */
 #modalbox, #picto-select-screen, #autopilot-screen{
   width: 80%;
-  max-width: 450px;
+  max-width: 700px;
   text-align: center;
   padding: 80px 60px;
   font-size: 22px;
@@ -69,7 +69,9 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
 }
-#autopilot-screen { height: 55%; }
+#autopilot-screen { 
+  height: 55%;
+ }
 
 #pictoGrid {
   display: grid;
@@ -139,4 +141,21 @@ body {
 
 /* AUTOPILOT ***/
 #autopilot-input::placeholder{ font-family: 'Wix Made For Display'; font-size: 16px; }
-#autopilot-content textarea { width: 280px; height: 130px; }
+#autopilot-next, #autopilot-prev, #closeAutopilotBtn { max-width: 20%; }
+#autopilot-next:hover, #autopilot-prev:hover, #closeAutopilotBtn:hover { transform: scale(1.03); }
+#autopilot-content textarea { 
+  width: 280px;
+  height: 130px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  resize: none;
+}
+#autopilot-content input[type=text] {
+  width: 280px;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+}

@@ -641,7 +641,7 @@ const autopilotData = {
                 <h2>Herzlich willkommen zum Autopiloten des Sharepic Generators. 🥳</h2>
                 <p>Nenne die Informationen, die auf dem Sharepic sein sollen, den Namen deines KV, und es wird automatisch ein passendes Sharepic erstellt!</p>
                 <p>Bitte beachte, dass das ein experimentelles Feature ist.</p>
-                <button onclick='closeAutopilot()'>Schließen</button>
+                <button id="closeAutopilotBtn" onclick='closeAutopilot()'>Schließen</button>
             `
         },
         {
@@ -658,6 +658,13 @@ const autopilotData = {
             question: 'Was? Wann? Wie? Wo? Wer?',
             key: 'text',
             placeholder: 'Grüne Geschäftsstelle, \nPhilosophenweg 2, \n19:30 Uhr'
+        },
+        {
+            type: 'intro',
+            html: `
+                <h2>Was fehlt noch?</h2>
+                <p>Füge gerne noch ein Piktogramm oder Bild hinzu :) </p>
+            `
         }
     ];
 let autopilotStepIndex = 0;
