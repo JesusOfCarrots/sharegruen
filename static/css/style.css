@@ -135,3 +135,8 @@ body {
     border-left: 1px solid #ccc;
     background: #f9f9f9;
 }
+
+
+/* AUTOPILOT ***/
+#autopilot-input::placeholder{ font-family: 'Wix Made For Display'; font-size: 16px; }
+#autopilot-content textarea { width: 280px; height: 130px; }

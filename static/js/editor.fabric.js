@@ -177,9 +177,15 @@ function showProps(obj) {
         textInput.rows = 3;
         textInput.value = tb.text || '';
         textInput.addEventListener('input', () => {
-            tb.text = textInput.value;
-            canvas.requestRenderAll();
+            tb.set('text', textInput.value);
+
+            // reset Chache
+            tb.set({ width: 0, dynamicMinWidth: 0 });
+            tb.initDimensions();
+            tb.setCoords();
+
             updateHeadlineBar(obj);
+            canvas.requestRenderAll();
         });
         addLabelInput("Headline:", textInput);
 
@@ -190,8 +196,13 @@ function showProps(obj) {
         sizeInput.addEventListener("input", () => {
             tb.fontSize = Number(sizeInput.value || 80);
             tb.set('lineHeight', 1.3);
-            canvas.requestRenderAll();
+
+            tb.set({ width: 0, dynamicMinWidth: 0 });
+            tb.initDimensions();
+            tb.setCoords();
+
             updateHeadlineBar(obj);
+            canvas.requestRenderAll();
         });
         addLabelInput('Schriftgröße:', sizeInput);
 
@@ -254,7 +265,8 @@ document.getElementById('addText').addEventListener('click', () => {
         fontSize: 60,
         fontFamily: FONT_FAMILY,
         fill: COLOR_BLACK,
-        editable: true
+        editable: true,
+        width: W - 160
     });
     canvas.add(tb).setActiveObject(tb);
     canvas.requestRenderAll();
@@ -292,7 +304,10 @@ function createHeadlineGroup() {
     
 
     const group = new fabric.Group([bar, text], {
-        left: 50, top: 150,
+        left: 50,
+        top: 150,
+        subTargetCheck: true, // Klick auf Text bleibt erkennbar
+        objectCaching: false  // verhindert falsche BBox-Berechnungen bei Updates
     });
 
     group._isHeadlineGroup = true;
@@ -301,8 +316,20 @@ function createHeadlineGroup() {
     text._isHeadlineChild = true;
     text._parentGroup = group;
 
-    text.on('changed', () => updateHeadlineBar(group));
-    text.on('modified', () => updateHeadlineBar(group));
+    text.on('changed', () => {
+        text.set({ width: 0, dynamicMinWidth: 0 });
+        text.initDimensions();
+        text.setCoords();
+        updateHeadlineBar(group);
+        canvas.requestRenderAll();
+    });
+    text.on('modified', () => {
+        text.set({ width: 0, dynamicMinWidth: 0 });
+        text.initDimensions();
+        text.setCoords();
+        updateHeadlineBar(group);
+        canvas.requestRenderAll();
+    });
     group.on('scaled',   () => updateHeadlineBar(group))
 
     // ensure correct Bar size after fonts loaded
@@ -319,20 +346,30 @@ function updateHeadlineBar(group) {
     const bar = group._barRect;
     const padX = 20;
 
+    const oldLeft = group.left;
+    const oldTop = group.top;
+
     text.initDimensions();
-    const textWidth = text.width;
     const textHeight = text.fontSize * text.lineHeight;
 
     bar.set({
         left: text.left - padX,
         top: text.top + (text.height - textHeight) / 2 - 2,
         //top: text.top + text.height - textHeight,
-        width: textWidth + padX * 2,
+        width: text.width + (padX * 2),
         height: textHeight,
         visible: true
     });
 
-    group.addWithUpdate();
+    group._calcBounds();
+    group._updateObjectsCoords();
+    
+    group.set({
+        left: oldLeft,
+        top: oldTop
+    });
+    group.setCoords();
+
     canvas.requestRenderAll();
 }
 
@@ -608,7 +645,7 @@ const autopilotData = {
         {
             question: 'Was? Wann? Wie? Wo? Wer?',
             key: 'text',
-            placeholder: 'Grüne Geschäftsstelle, Philosophenweg 2, 19:30 Uhr'
+            placeholder: 'Grüne Geschäftsstelle, \nPhilosophenweg 2, \n19:30 Uhr'
         }
     ];
 let autopilotStepIndex = 0;
@@ -631,11 +668,21 @@ function showAutopilotStep(index) {
     if (step.type === 'intro') {
         screen.innerHTML = step.html;
     } else {
-        screen.innerHTML = `
-            <h2>${step.question}</h2>
-            <input type="text" id="autopilot-input" placeholder="${step.placeholder}" 
-                   value="${autopilotData[step.key] || ''}">
-        `;
+        // KV = input
+        if(step.key === 'kv'){
+            screen.innerHTML = `
+                <h2>${step.question}</h2>
+                <input type="text" id="autopilot-input" placeholder="${step.placeholder}" 
+                    value="${autopilotData[step.key] || ''}">
+            `;
+        }
+        // Headline oder Text = Textarea
+        else{
+            screen.innerHTML = `
+                <h2>${step.question}</h2>
+                <textarea id="autopilot-input" placeholder="${step.placeholder}" rows="4">${autopilotData[step.key] || ''}</textarea>
+            `;
+        }
     }
 
     prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
@@ -672,22 +719,35 @@ async function runAutopilot() {
     if (randomThumb){
         variant = await loadBackground(randomThumb.dataset.src);
         console.log("BG variant:", variant);
+
+        document.querySelectorAll('.bg-thumb').forEach(i => i.classList.remove('selected'));
+        randomThumb.classList.add('selected');
     }
-    
+
     // add KV Logo
     if(autopilotData.kv) {
         addKVLogo(autopilotData.kv);
         updateKVLogoVariant(variant);
     }
 
-    // add headline
+    // add headline || for every line add a new headline element offseted by 250
     if (autopilotData.headline){
-        const group = createHeadlineGroup();
-        const textObj = group._headlineText;
-        textObj.text = '';
-        textObj.text = autopilotData.headline;
-        updateHeadlineBar(group);
-        canvas.add(group);
+        const lines = autopilotData.headline.split(/\r?\n/).filter(l => l.trim() !== '');
+        let yOffset = 150;
+        let offsetAmount = 110;
+
+        for (const line of lines){
+            const group = createHeadlineGroup();
+            const textObj = group._headlineText;
+            textObj.text = '';
+            textObj.text = line.trim();
+            updateHeadlineBar(group);
+
+            group.set({ top: yOffset });
+            yOffset += offsetAmount;
+
+            canvas.add(group);
+        }
     }
 
     // ad. Text
@@ -715,11 +775,13 @@ function closeAutopilot(){
     const overlay = document.getElementById("autopilot-overlay");
     overlay.style.display = 'none';
 }
+/*
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && document.getElementById('autopilot-overlay').style.display === 'flex') {
         document.getElementById('autopilot-next').click();
     }
-});
+}); 
+*/
 
 //#endregion
 
