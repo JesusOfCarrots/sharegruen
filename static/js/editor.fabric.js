@@ -279,7 +279,7 @@ function createHeadlineGroup() {
     const padX = 20;
 
 
-    const text = new fabric.Textbox('', {
+    const text = new fabric.Text('', {
         left: 68 - (padX *2 + 2), top: 0,
         fontSize,
         lineHeight: lineHeight,
@@ -289,6 +289,7 @@ function createHeadlineGroup() {
         fill: COLOR_BLACK,
         editable: true
     });
+
 
     text.initDimensions();
 
@@ -736,6 +737,9 @@ async function runAutopilot() {
         const lines = autopilotData.headline.split(/\r?\n/).filter(l => l.trim() !== '');
         let yOffset = 150;
         let offsetAmount = 110;
+
+        await document.fonts.ready;
+        await document.fonts.load(`800 90px "${FONT_FAMILY}"`);
 
         for (const line of lines){
             const group = createHeadlineGroup();
