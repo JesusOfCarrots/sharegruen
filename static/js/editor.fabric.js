@@ -56,9 +56,17 @@ function loadBackground(src) {
             canvas.sendToBack(bgImageObj);
             canvas.requestRenderAll();
 
+            // update Logo color
             const isDark = DARK_BACKGROUNDS.includes(src);
             const variant = isDark ? 'light' : 'dark';
             updateKVLogoVariant(variant);
+
+            // Update Bar color
+            canvas.getObjects().forEach(obj => {
+                if (obj._isHeadlineGroup){
+                    updateHeadlineBar(obj);
+                }
+            });
 
             resolve(variant);
         }, { crossOrigin: 'anonymous' });
@@ -300,7 +308,8 @@ function createHeadlineGroup() {
         height: fontSize * lineHeight,
         fill: COLOR_HELLGRUEN,
         selectable: false,
-        evented: false
+        evented: false,
+        fill: bgImageObj._bgSrc === 'GJ_Gruen.png' ? COLOR_WHITE : COLOR_HELLGRUEN
     });
 
     
@@ -360,7 +369,8 @@ function updateHeadlineBar(group) {
         //top: text.top + text.height - textHeight,
         width: text.width + (padX * 2),
         height: textHeight,
-        visible: true
+        visible: true,
+        fill: bgImageObj._bgSrc === 'GJ_Gruen.png' ? COLOR_WHITE : COLOR_HELLGRUEN
     });
 
     group._calcBounds();
