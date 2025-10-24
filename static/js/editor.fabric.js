@@ -27,39 +27,42 @@ const DARK_BACKGROUNDS = [
 let bgImageObj = null;
 
 function loadBackground(src) {
-    const imgURL = '/static/backgrounds/' + src;
+    return new Promise((resolve) => {
+        const imgURL = '/static/backgrounds/' + src;
 
-    fabric.Image.fromURL(imgURL, (img) => {
-        const cw = canvas.getWidth();
-        const ch = canvas.getHeight();
-        const scale = Math.max(cw / img.width, ch / img.height);
+        fabric.Image.fromURL(imgURL, (img) => {
+            const cw = canvas.getWidth();
+            const ch = canvas.getHeight();
+            const scale = Math.max(cw / img.width, ch / img.height);
 
-        img.set({
-            left: (cw - img.width * scale) / 2,
-            top: (ch - img.height * scale) / 2,
-            originX: 'left',
-            originY: 'top',
-            selectable: false,
-            evented: false,
-            scaleX: scale,
-            scaleY: scale
-        });
+            img.set({
+                left: (cw - img.width * scale) / 2,
+                top: (ch - img.height * scale) / 2,
+                originX: 'left',
+                originY: 'top',
+                selectable: false,
+                evented: false,
+                scaleX: scale,
+                scaleY: scale
+            });
 
-        if (bgImageObj) {
-            canvas.remove(bgImageObj);
-        }
-        img._bgSrc = src;
-        
-        bgImageObj = img;
-        canvas.add(bgImageObj);
-        canvas.sendToBack(bgImageObj);
-        canvas.requestRenderAll();
+            if (bgImageObj) {
+                canvas.remove(bgImageObj);
+            }
+            img._bgSrc = src;
+            
+            bgImageObj = img;
+            canvas.add(bgImageObj);
+            canvas.sendToBack(bgImageObj);
+            canvas.requestRenderAll();
 
-        const isDark = DARK_BACKGROUNDS.includes(src);
-        const variant = isDark ? 'light' : 'dark';
-        updateKVLogoVariant(variant);
+            const isDark = DARK_BACKGROUNDS.includes(src);
+            const variant = isDark ? 'light' : 'dark';
+            updateKVLogoVariant(variant);
 
-    }, { crossOrigin: 'anonymous' });
+            resolve(variant);
+        }, { crossOrigin: 'anonymous' });
+    });
 }
 
 // Click Thumbnails | Add selected class
@@ -575,6 +578,150 @@ document.onkeydown = function(e) {
 }
 
 
+//#region Autopilot
+const autopilotData = {
+        kv: '',
+        headline: '',
+        text: ''
+        // pictogram
+    };
+    const autopilotSteps = [
+        {
+            type: 'intro',
+            html: `
+                <h2>Herzlich willkommen zum Autopiloten des Sharepic Generators. 🥳</h2>
+                <p>Nenne die Informationen, die auf dem Sharepic sein sollen, den Namen deines KV, und es wird automatisch ein passendes Sharepic erstellt!</p>
+                <p>Bitte beachte, dass das ein experimentelles Feature ist.</p>
+                <button onclick='closeAutopilot()'>Schließen</button>
+            `
+        },
+        {
+            question: 'Wie heißt dein Kreisverband?',
+            key: 'kv',
+            placeholder: 'z.B: Duisburg'
+        },
+        {
+            question: 'Was ist der Anlass des Sharepics?',
+            key: 'headline',
+            placeholder: 'z.B: Bundeskongress Plenum'
+        },
+        {
+            question: 'Was? Wann? Wie? Wo? Wer?',
+            key: 'text',
+            placeholder: 'Grüne Geschäftsstelle, Philosophenweg 2, 19:30 Uhr'
+        }
+    ];
+let autopilotStepIndex = 0;
+
+function startAutopilotDialouge() {
+    const overlay = document.getElementById("autopilot-overlay");
+    overlay.style.display = 'flex';
+    showAutopilotStep(0);
+}
+
+function showAutopilotStep(index) {
+    const screen = document.getElementById('autopilot-content');
+    const prevBtn = document.getElementById('autopilot-prev');
+    const nextBtn = document.getElementById('autopilot-next');
+
+    autopilotStepIndex = index;
+    const step = autopilotSteps[index];
+
+    // Intro-Slide
+    if (step.type === 'intro') {
+        screen.innerHTML = step.html;
+    } else {
+        screen.innerHTML = `
+            <h2>${step.question}</h2>
+            <input type="text" id="autopilot-input" placeholder="${step.placeholder}" 
+                   value="${autopilotData[step.key] || ''}">
+        `;
+    }
+
+    prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
+    nextBtn.textContent = (index === autopilotSteps.length - 1) ? 'Fertig' : 'Weiter';
+}
+
+document.getElementById('autopilot-next').addEventListener('click', () => {
+    const step = autopilotSteps[autopilotStepIndex];
+
+    if(step.key){
+        const input = document.getElementById('autopilot-input');
+        autopilotData[step.key] = input.value.trim();
+    }
+
+    if(autopilotStepIndex < autopilotSteps.length - 1) {
+        showAutopilotStep(autopilotStepIndex+1);
+    }else{
+        runAutopilot();
+    }
+});
+document.getElementById('autopilot-prev').addEventListener('click', () => {
+    if (autopilotStepIndex > 0) showAutopilotStep(autopilotStepIndex - 1);
+});
+
+//generate Sharepic
+async function runAutopilot() {
+    const overlay = document.getElementById('autopilot-overlay');
+    overlay.style.display = 'none';
+
+    // random bg
+    const thumbs = document.querySelectorAll('.bg-thumb');
+    const randomThumb = thumbs[Math.floor(Math.random() * thumbs.length)];
+    let variant = 'dark';
+    if (randomThumb){
+        variant = await loadBackground(randomThumb.dataset.src);
+        console.log("BG variant:", variant);
+    }
+    
+    // add KV Logo
+    if(autopilotData.kv) {
+        addKVLogo(autopilotData.kv);
+        updateKVLogoVariant(variant);
+    }
+
+    // add headline
+    if (autopilotData.headline){
+        const group = createHeadlineGroup();
+        const textObj = group._headlineText;
+        textObj.text = '';
+        textObj.text = autopilotData.headline;
+        updateHeadlineBar(group);
+        canvas.add(group);
+    }
+
+    // ad. Text
+    if (autopilotData.text) {
+        const tb = new fabric.Textbox(autopilotData.text, {
+            left: 68, top: 540,
+            fontSize: 60,
+            fontFamily: FONT_FAMILY,
+            fill: COLOR_BLACK,
+            editable: true,
+            width: W - 160
+        });
+        canvas.add(tb);
+    }
+
+    canvas.requestRenderAll();
+
+    setTimeout(() => {
+        document.getElementById('export').click();
+    }, 1500);
+}
+
+
+function closeAutopilot(){
+    const overlay = document.getElementById("autopilot-overlay");
+    overlay.style.display = 'none';
+}
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.getElementById('autopilot-overlay').style.display === 'flex') {
+        document.getElementById('autopilot-next').click();
+    }
+});
+
+//#endregion
 
 //#region EXPORT
 document.getElementById('export').addEventListener('click', async () => {

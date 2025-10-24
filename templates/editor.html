@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/buttons.css">
     <title>Share Gruen Editor</title>
 
   <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
@@ -53,7 +54,7 @@
 
         <div class="tool-group">
             <button id="export">Exportieren (PNG)</button> <br>
-            <button id="autopilotStart"><span>Autopilot</span></button>
+            <button id="autopilotStart" onclick="startAutopilotDialouge()"><span>Autopilot</span></button>
         </div>
             
     </div>
@@ -82,6 +83,16 @@
         </div>
     </div>
 
+    <!-- Autopilot canvas -->
+    <div id="autopilot-overlay">
+        <div id="autopilot-screen">
+            <div id="autopilot-content"></div>
+            <div class="autopilot-buttons">
+                <button id="autopilot-next">Weiter</button>
+                <button id="autopilot-prev" style="display: none;">Zurück</button>
+            </div>
+        </div>
+    </div>
 
     <div id="overlay">
         <div id="modalbox">
