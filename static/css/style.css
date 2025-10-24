@@ -122,13 +122,6 @@ body {
     padding: 20px;
   }
   
-.toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 10px;
-}
-  
 #canvas-container {
     display: flex;
     position: relative;
@@ -147,6 +140,7 @@ body {
     background: #f9f9f9;
 }
 
+/* TOOL BAR BUTTONS */
 button, input::placeholder {font-family: 'Wix Made For Display';}
 header button {
   background: url('/static/backgrounds/GJ_Verlaufe_IG3.png') fixed; /* 3 || 12 */
@@ -159,7 +153,87 @@ header button {
   cursor: pointer;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
 }
-header button:hover{padding: 7px; opacity: 0.83;}
+header button:hover{opacity: 0.9; transform: scale(1.03);}
+
+.toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.tool-group{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  min-width: 200px;
+  max-width: 100%;
+}
+/* Animate Autopilot Button */
+#autopilotStart {
+  position: relative;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  background: #33c270; /* base button color */
+  font-weight: 700;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  z-index: 0;
+}
+
+/* animated rainbow edge */
+#autopilotStart::before {
+  content: "";
+  position: absolute;
+  inset: -2px; /* slightly outside to look like an outer border */
+  background: linear-gradient(
+    270deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  background-size: 400% 400%;
+  border-radius: 8px;
+  animation: rainbowMove 6s linear infinite;
+  z-index: -1;
+  filter: brightness(1.2);
+}
+
+/* subtle glowing effect (optional but beautiful) */
+#autopilotStart::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 8px;
+  background: inherit;
+  filter: blur(10px);
+  opacity: 0.6;
+  z-index: -2;
+  animation: rainbowMove 6s linear infinite;
+}
+
+@keyframes rainbowMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
 
 
 .bg-options {

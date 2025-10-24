@@ -11,6 +11,8 @@
 
 <header>
     <div class="toolbar">
+
+        <div class="tool-group">
             <label for="bgSelect">Hitergrund:</label>
             <div class="bg-options">
                 <img src="/static/backgrounds/GJ_dunkelGruen.png" data-src="GJ_dunkelGruen.png" class="bg-thumb">
@@ -33,19 +35,28 @@
                 <img src="/static/backgrounds/GJ_Verlaufe_IG12.png" data-src="GJ_Verlaufe_IG12.png" class="bg-thumb">
 
             </div>
+        </div>
 
+        <div class="tool-group">
             <label for="kvInput">Kreisverband:</label>
             <input type="text" id="kvInput" placeholder="Duisburg">
-            <button id="setKV">Logo einfügen</button> <br>
+            <button id="setKV">Logo einfügen</button>
+        </div>
 
+        <div class="tool-group">
             <button id="addText">Text hinzufuegen</button>
             <button id="addHeadline">Headline mit CD-Hinterlegung</button>
             <button id="addPicto" onclick="piktogramme()">Pictogram Hinzuügen</button>
             <button id="addImg">Bild Hinzuügen</button>
             <input type="file" id="imgUploadInput" accept="image/*" style="display: none;"> <!-- Hide -> Button trigger -->
-            <button id="export">Exportieren (PNG)</button>
-            
         </div>
+
+        <div class="tool-group">
+            <button id="export">Exportieren (PNG)</button> <br>
+            <button id="autopilotStart"><span>Autopilot</span></button>
+        </div>
+            
+    </div>
 </header>
 
 <body onload="showModal()">

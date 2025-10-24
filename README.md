@@ -11,6 +11,7 @@ Weiteres folgt.
 - issue with scaling the text from the Headline 
 - No new lines in properties Tex textbox (simple Text)
 - cleanup folder 'uploads'
+- autopilot
 
 
 # Donation
