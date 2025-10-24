@@ -285,6 +285,7 @@ function createHeadlineGroup() {
         lineHeight: lineHeight,
         fontFamily: FONT_FAMILY,
         fontWeight: 800,
+        fontStyle: 'normal',
         fill: COLOR_BLACK,
         editable: true
     });
@@ -740,7 +741,13 @@ async function runAutopilot() {
             const group = createHeadlineGroup();
             const textObj = group._headlineText;
             textObj.text = '';
-            textObj.text = line.trim();
+
+            await document.fonts.ready;
+
+            textObj.set({ width: 0, dynamicMinWidth: 0, text: line.trim() });
+            textObj.initDimensions();
+            textObj.setCoords();
+
             updateHeadlineBar(group);
 
             group.set({ top: yOffset });
