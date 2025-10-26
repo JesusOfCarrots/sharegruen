@@ -1,3 +1,5 @@
 uploads/
 
+venv/
+
 !uploads/.gitkeep
