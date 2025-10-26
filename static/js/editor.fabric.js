@@ -236,12 +236,7 @@ function showProps(obj) {
         svgColor.value = toHex(COLOR_BLACK); 
         svgColor.addEventListener('input', () => { 
             if (!obj) return; // sanity check
-
-            for (var i = 0; i < obj._objects.length; i++) {
-                obj._objects[i].set({
-                    fill: svgColor.value
-                });
-        }
+            obj.set({ fill: svgColor.value });    
 
         canvas.requestRenderAll();
         }); 
