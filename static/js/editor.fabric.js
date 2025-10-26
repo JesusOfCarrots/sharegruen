@@ -235,11 +235,14 @@ function showProps(obj) {
 
         svgColor.value = toHex(COLOR_BLACK); 
         svgColor.addEventListener('input', () => { 
+            if (!obj) return; // sanity check
+
             for (var i = 0; i < obj._objects.length; i++) {
                 obj._objects[i].set({
                     fill: svgColor.value
                 });
         }
+
         canvas.requestRenderAll();
         }); 
         addLabelInput('Farbe:', svgColor);
@@ -572,7 +575,7 @@ uploadInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const maxSizeMB = 3;
+    const maxSizeMB = 5;
     if(file.size > maxSizeMB * 1024 * 1024) {
         alert(`Die Datei ist zu groß! Maximal erlaubt sind ${maxSizeMB} MB.`);
         uploadInput.value = '';
