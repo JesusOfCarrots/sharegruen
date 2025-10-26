@@ -572,6 +572,13 @@ uploadInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    const maxSizeMB = 3;
+    if(file.size > maxSizeMB * 1024 * 1024) {
+        alert(`Die Datei ist zu groß! Maximal erlaubt sind ${maxSizeMB} MB.`);
+        uploadInput.value = '';
+        return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
