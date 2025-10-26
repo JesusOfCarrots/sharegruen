@@ -11,6 +11,7 @@ Weiteres folgt.
 - No new lines in properties Tex textbox (simple Text)
 - cleanup folder 'uploads'
 - canvas size
+- underlie single words
 
 
 # Donation
