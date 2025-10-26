@@ -3,6 +3,8 @@ import os, re, base64
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024  # 3 MB
+
 UPLOAD_DIR = 'uploads'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -11,8 +13,6 @@ FORMATS = {
     "insta_post":  {"w": 1080, "h": 1350, "label": "Instagram Post (1080×1350)"},
     "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
 }
-
-MAX_FILE_AGE = 60 * 60 * 24    # 24h
 
 
 @app.route('/')
@@ -82,6 +82,12 @@ def list_piktogramme():
     picto_dir = os.path.join(app.static_folder, "piktogramme")
     files = [f for f in os.listdir(picto_dir) if f.lower().endswith(".svg")]
     return jsonify(files)
+
+
+
+@app.errorhandler(413)
+def file_too_large(e):
+    return jsonify({"error": "Die Datei ist zu groß! Maximal 3 MB erlaubt."}), 413
 
 
 if __name__ == '__main__':
