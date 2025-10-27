@@ -233,16 +233,46 @@ function showProps(obj) {
         const svgColor = document.createElement('input'); 
         svgColor.type = 'color'; 
 
-        svgColor.value = toHex(COLOR_BLACK); 
-        svgColor.addEventListener('input', () => { 
-            if (!obj) return; // sanity check
-            obj.set({ fill: svgColor.value });    
+        let currentFill = COLOR_BLACK;
 
-        canvas.requestRenderAll();
+        const findFill = (o) => {
+            if (o._objects && Array.isArray(o._objects)) {
+                for (const child of o._objects) {
+                    const found = findFill(child);
+                    if (found) return found;
+                }
+            } else {
+                if (o.fill && /^#|rgb|hsl/.test(o.fill)) {
+                    return o.fill;
+                }
+            }
+            return null;
+        };
+
+        const foundColor = findFill(obj);
+        if (foundColor) currentFill = foundColor;
+        svgColor.value = toHex(currentFill);
+
+        const applyColor = (o, color) => {
+            if (o._objects && Array.isArray(o._objects)) {
+                o._objects.forEach(child => applyColor(child, color));
+            } else {
+                if ('fill' in o && o.fill) o.set({ fill: color });
+                if ('stroke' in o && o.stroke) o.set({ stroke: color });
+            }
+        };
+
+        svgColor.addEventListener('input', () => { 
+            if (!obj) return;
+            applyColor(obj, svgColor.value);
+            obj._svgColor = svgColor.value; // optional: speichere Farbe im Objekt
+            canvas.requestRenderAll();
         }); 
+
         addLabelInput('Farbe:', svgColor);
     }
 }
+
 //#endregion
 
 function toHex(color) {
