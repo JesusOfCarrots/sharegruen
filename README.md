@@ -7,11 +7,7 @@ Weiteres folgt.
 
 
 # ToDo
-- issue with scaling the text from the Headline (horizontal)
-- No new lines in properties Tex textbox (simple Text)
-- cleanup folder 'uploads'
-- canvas size
-- underlie single words
+https://trello.com/invite/b/6901216e4f1c0ddb19ce9a11/ATTI697f15ae0b392e6750d69032beae9c5841AF6C96/gj-sharepic-gen-von-mel
 
 
 # Donation
