@@ -16,7 +16,7 @@
   font-weight: 600; /* SemiBold */
   font-style: normal;
 }
-button, a {transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;}
+button, a, img {transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;}
 html, body{
   margin: 0;
   padding: 0;

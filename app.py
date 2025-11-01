@@ -10,20 +10,47 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # FORMATS
 FORMATS = {
-    "insta_post":  {"w": 1080, "h": 1350, "label": "Instagram Post (1080×1350)"},
-    "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
+    "instagram": {
+        "label": "Instagram",
+        "icon": "/static/img/instagram.svg",
+        "formats": {
+            "insta_post":  {"w": 1080, "h": 1350, "label": "Instagram Post (1080×1350)"},
+            "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
+        }
+    },
+    "twitter": {
+        "label": "X",
+        "icon": "/static/img/x_icon.svg",
+        "formats": {
+             "tweet_image": {"w": 1200, "h": 675, "label": "Tweet Image (1200×675)"}
+         }
+    },
+    "youtube": {
+        "label": "Youtube",
+        "icon": "/static/img/youtube-icon.svg",
+        "formats": {
+            "yt_thumbnail": {"w": 1280, "h": 720, "label": "Youtube Thumbnail (1280x720)"}
+        }
+    }
 }
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', formats=FORMATS)
+    return render_template('index.html', platforms=FORMATS)
 
 
 @app.route('/editor')
 def editor():
     fmt = request.args.get('fmt', 'insta_post')
-    f = FORMATS.get(fmt, FORMATS['insta_post'])
+
+    for platform, pdata in FORMATS.items():
+        if fmt in pdata['formats']:
+            f = pdata['formats'][fmt]
+            break
+    else:
+        f = FORMATS['instagram']['formats']['insta_post']
+
     return render_template('editor.html', format_key=fmt, width=f['w'], height=f['h'], formats=FORMATS)
 
 

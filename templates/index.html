@@ -4,17 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/indexStyle.css">
     <title>Share Gruen</title>
 </head>
 <body>
     <main class="container">
-        <h1>Grüner Sharepic Generator</h1>
-        <p>Wähle ein Format:</p>
-        <ul>
-            {% for key, val in formats.items() %}
-            <li><a href="/editor?fmt={{key}}">{{val.label}}</a></li>
+        <h1 style="margin-top: 5px;">GJ 2024 Sharepic Generator</h1>
+
+        <div class="tabs">
+            {% for pkey, platform in platforms.items() %}
+                <div class="tab {% if loop.first %}active{% endif %}" data-target="{{ pkey }}">
+                    <img src="{{ platform.icon }}" alt="{{ platform.label }}">
+                </div>
             {% endfor %}
-        </ul>
+        </div>
+
+        <div class="formats-wrapper">
+            {% for pkey, platform in platforms.items() %}
+                <div class="formats {% if loop.first %}active{% endif %}" id="{{ pkey }}">
+                    <ul>
+                        {% for fkey, fval in platform.formats.items() %}
+                            <li><a href="/editor?fmt={{ fkey }}">{{ fval.label }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
     </main>
+
+    <script>
+        // Tabs
+        const tabs = document.querySelectorAll('.tab');
+        const groups = document.querySelectorAll('.formats');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () =>{
+                tabs.forEach(t => t.classList.remove('active'));
+                groups.forEach(g => g.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.target).classList.add('active');
+            });
+        });
+
+
+        //radnom bg
+        const r = Math.ceil(Math.random() * 12) 
+        document.body.style.background = `url('/static/backgrounds/GJ_Verlaufe_IG${r}.png') fixed`;
+        document.body.style.backgroundSize = "cover";
+    </script>
+
+    <img src="/static/signature.svg" alt="Signature" class="signature">
 </body>
 </html>
