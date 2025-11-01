@@ -159,3 +159,11 @@ body {
   margin: 10px 0;
   box-sizing: border-box;
 }
+.autopilot-export-container {
+    margin-top: 1.2rem;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+}
+.autopilot-export-container input {
+    margin-right: 0.5rem;
+}
