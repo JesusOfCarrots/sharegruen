@@ -1,10 +1,17 @@
+fabric.devicePixelRatio = 1;
+
 // Initialize Canvas
 const canvas = new fabric.Canvas('editorCanvas', {
     selection: true,
     preserveObjectStacking: true,
     width: W,
-    height: H
+    height: H,
+    enableRetinaScaling: false 
 });
+canvas.setDimensions({ W, H });
+canvas.setZoom(1);
+canvas.getElement().style.width  = `${W}px`;
+canvas.getElement().style.height = `${H}px`;
 
 //#region CD BASICS
 const FONT_FAMILY = 'Wix Made For Display';
