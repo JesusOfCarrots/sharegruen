@@ -12,22 +12,30 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 FORMATS = {
     "instagram": {
         "label": "Instagram",
-        "icon": "/static/img/instagram.svg",
+        "icon": "/static/img/sm_logos/instagram.svg",
         "formats": {
             "insta_post":  {"w": 1080, "h": 1350, "label": "Instagram Post (1080×1350)"},
             "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
         }
     },
+    "facebook": {
+        "label": "Facebook",
+        "icon": "/static/img/sm_logos/facebook-logo.svg",
+        "formats": {
+            "facebook_post": {"w": 940, "h": 788, "label": "Facebook Beitrag (940x788)"},
+            "facebook_hero": {"w": 851, "h": 315, "label": "Facebook Titelbild (851x315)"},
+        }
+    },
     "twitter": {
         "label": "X",
-        "icon": "/static/img/x_icon.svg",
+        "icon": "/static/img/sm_logos/x_icon.svg",
         "formats": {
              "tweet_image": {"w": 1200, "h": 675, "label": "Tweet Image (1200×675)"}
          }
     },
     "youtube": {
         "label": "Youtube",
-        "icon": "/static/img/youtube-icon.svg",
+        "icon": "/static/img/sm_logos/youtube-icon.svg",
         "formats": {
             "yt_thumbnail": {"w": 1280, "h": 720, "label": "Youtube Thumbnail (1280x720)"}
         }
