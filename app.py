@@ -3,7 +3,7 @@ import os, re, base64
 from datetime import datetime
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
-app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
+app.config['MAX_CONTENT_LENGTH'] = 6 * 1024 * 1024  # 6 MB
 
 UPLOAD_DIR = 'uploads'
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -87,6 +87,19 @@ def export():
         fh.write(base64.b64decode(encoded))
     return jsonify({"url": f"/downloads/{filename}"}), 200
 
+
+@app.route('/export_file', methods =['POST'])
+def export_file():
+    f = request.files.get('image')
+    if not f:
+        return jsonify({"error": "no file"}), 400
+    ext = 'png' if f.mimetype == 'image/png' else 'jpg'
+    filename = datetime.utcnow().strftime('%Y%m%d%H%M%S_export.') + ext
+    path = os.path.join(UPLOAD_DIR, filename)
+    f.save(path)
+    return jsonify({"url": f"/downloads/{filename}"}), 200
+
+
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(UPLOAD_DIR, filename)
@@ -122,7 +135,7 @@ def list_piktogramme():
 
 @app.errorhandler(413)
 def file_too_large(e):
-    return jsonify({"error": "Die Datei ist zu groß! Maximal 3 MB erlaubt."}), 413
+    return jsonify({"error": "Die Datei ist zu groß! Maximal 6 MB erlaubt."}), 413
 
 
 if __name__ == '__main__':

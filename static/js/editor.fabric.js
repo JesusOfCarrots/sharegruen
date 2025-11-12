@@ -8,7 +8,7 @@ const canvas = new fabric.Canvas('editorCanvas', {
     height: H,
     enableRetinaScaling: false 
 });
-canvas.setDimensions({ W, H });
+canvas.setDimensions({ width: W, height: H });
 canvas.setZoom(1);
 canvas.getElement().style.width  = `${W}px`;
 canvas.getElement().style.height = `${H}px`;
@@ -715,7 +715,7 @@ uploadInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const maxSizeMB = 5;
+    const maxSizeMB = 20;
     if(file.size > maxSizeMB * 1024 * 1024) {
         alert(`Die Datei ist zu groß! Maximal erlaubt sind ${maxSizeMB} MB.`);
         uploadInput.value = '';
@@ -965,22 +965,64 @@ document.addEventListener('keydown', (e) => {
 //#endregion
 
 //#region EXPORT
+async function withCleanExport(fn) {
+    const prevSelection = canvas.selection;
+    const active = canvas.getActiveObject();
+    const prevFlags = new Map();
+    canvas.getObjects().forEach(o => {
+        prevFlags.set(o, { hasControls: o.hasControls, hasBorders: o.hasBorders });
+        o.hasControls = false;
+        o.hasBorders  = false;
+    });
+
+    canvas.selection = false;
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
+    await new Promise(r => requestAnimationFrame(r));
+
+    try {
+        return await fn();
+    } finally {
+        canvas.selection = prevSelection;
+        if (active) canvas.setActiveObject(active);
+        prevFlags.forEach((flags, o) => {
+        o.hasControls = flags.hasControls;
+        o.hasBorders  = flags.hasBorders;
+        });
+        canvas.renderAll();
+    }
+}
+
 document.getElementById('export').addEventListener('click', async () => {
     if (bgImageObj) canvas.sendToBack(bgImageObj);
-    canvas.discardActiveObject();
-    canvas.requestRenderAll();
 
-    const dataURL = canvas.toDataURL({ format: 'png', enableRetinaScaling: true });
-    const res = await fetch('/export', {
-        method: 'POST',
-        headers: { 'Content-Type': "application/json" },
-        body: JSON.stringify({ dataURL })
-    });
-    const json = await res.json();
-    if (json.url) {
+    const result = await withCleanExport(async () => {
+        const htmlCanvas = canvas.getElement();
+
+        const blob = await new Promise(resolve =>
+            htmlCanvas.toBlob(resolve, 'image/jpeg', 0.85)
+        );
+        if (!blob) {
+            alert('Fehler beim Erstellen des Bildes.');
+            return;
+        }
+
+        const form = new FormData();
+        form.append('image', blob, blob.type === 'image/png' ? 'sharepic.png' : 'sharepic.jpg');
+
+        const res = await fetch('/export_file', { method: 'POST', body: form });
+        const ct = res.headers.get('content-type') || '';
+        if (!res.ok) {
+            const msg = ct.includes('application/json') ? (await res.json()).error : await res.text();
+            alert('Export fehlgeschlagen: ' + msg);
+            return;
+        }
+        const json = await res.json();
         window.location.href = json.url;
-    } else {
-        alert('Export fehlgeschlagen.');
-    }
+    });
+
+    return result;
 });
+
 //#endregion
