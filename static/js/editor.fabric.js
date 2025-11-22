@@ -173,8 +173,13 @@ function showProps(obj) {
 
 
     if (obj.type === 'textbox') {
-        const textInput = document.createElement('input');
+        const textInput = document.createElement('textarea');
         textInput.type = 'text';
+        textInput.style.cssText = `
+            min-height: 7rem;
+            width: 200px;
+            resize: none;
+        `;
         textInput.value = obj.text || '';
         textInput.addEventListener('input', () => {
             obj.text = textInput.value;
