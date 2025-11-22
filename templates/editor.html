@@ -14,7 +14,7 @@
     <div class="toolbar">
 
         <div class="tool-group">
-            <label for="bgSelect">Hitergrund:</label>
+            <label for="bgSelect">Hitergrund: <button id="settings-btn" onclick="openSettings()"></button></label>
             <div class="bg-options">
                 <img src="/static/backgrounds/GJ_dunkelGruen.png" data-src="GJ_dunkelGruen.png" class="bg-thumb">
                 <img src="/static/backgrounds/GJ_Gruen.png" data-src="GJ_Gruen.png" class="bg-thumb">
@@ -94,6 +94,21 @@
         </div>
     </div>
 
+    <!-- Settings canvas -->
+    <div id="settings-overlay">
+        <div id="settings-screen" class="dialog">
+            <h2>Canvas Größe anpassen</h2> <br>
+
+            <h3 id="canvas-scale-text" class="canvas-scale-text">10%</h3>
+
+            <input type="range" id="canvas-size-input" value="0.77" min="0.1" max="1" step="0.1">
+
+            <button id="settings-close-btn" class="closeBtn" onclick="closeSettings()">
+                Schließen
+            </button>
+        </div>
+    </div>
+
     <div id="overlay">
         <div id="modalbox">
             <h3 style="margin-top: 0;">Herzlich willkommen zum Sharepic generator der GRÜNEN JUGEND. </h3>
@@ -124,6 +139,16 @@
         function closeModal() {
             document.getElementById('overlay').style.display = 'none';
         }
+        function closePicto() {
+            document.getElementById("picto-overlay").style.display = 'none';
+        }
+        function openSettings() {
+            document.getElementById("settings-overlay").style.display = "flex";
+        }
+
+        function closeSettings() {
+            document.getElementById("settings-overlay").style.display = "none";
+        }
 
         document.getElementById("setKV").addEventListener('click', () => {
             const kv = document.getElementById('kvInput').value.trim();
@@ -133,10 +158,11 @@
 
         // random bg for buttons
         const r = Math.ceil(Math.random() * 12)
-        document.querySelectorAll("header button").forEach(btn => {
+        document.querySelectorAll("header button:not(#settings-btn)").forEach(btn => {
             btn.style.background = `url('/static/backgrounds/GJ_Verlaufe_IG${r}.png') fixed`;
             btn.style.backgroundSize = "cover";
         });
+        document.querySelector('#settings-screen input[type=range]').style.setProperty('--thumb-bg', `url('/static/backgrounds/GJ_Verlaufe_IG${r}.png') center/cover no-repeat`);
     </script>
     <script src="/static/js/editor.fabric.js"></script>
 </body>

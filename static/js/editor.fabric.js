@@ -8,10 +8,30 @@ const canvas = new fabric.Canvas('editorCanvas', {
     height: H,
     enableRetinaScaling: false 
 });
+
 canvas.setDimensions({ width: W, height: H });
-canvas.setZoom(1);
-canvas.getElement().style.width  = `${W}px`;
-canvas.getElement().style.height = `${H}px`;
+
+const stageContainer = document.getElementById('stage-container');
+let scaleFactor = 1;
+let canvasMargin = 0.77; // use 77% of available space
+
+function updateCanvasSclae(){
+    const rect = stageContainer.getBoundingClientRect();
+
+    const scale = Math.min(
+        (rect.width * canvasMargin) / W,
+        (rect.height * canvasMargin) / H,
+        1
+    );
+
+    scaleFactor = scale;
+    canvas.setZoom(scaleFactor);
+    canvas.calcOffset();
+
+    canvas.requestRenderAll();
+}
+updateCanvasSclae();
+window.addEventListener('resize', updateCanvasSclae);
 
 //#region CD BASICS
 const FONT_FAMILY = 'Wix Made For Display';
@@ -42,17 +62,18 @@ function loadBackground(src) {
         fabric.Image.fromURL(imgURL, (img) => {
             const cw = canvas.getWidth();
             const ch = canvas.getHeight();
-            const scale = Math.max(cw / img.width, ch / img.height);
+            const scaleX = cw / img.width;
+            const scaleY = ch / img.height;
 
             img.set({
-                left: (cw - img.width * scale) / 2,
-                top: (ch - img.height * scale) / 2,
+                left: 0,
+                top: 0,
                 originX: 'left',
                 originY: 'top',
                 selectable: false,
                 evented: false,
-                scaleX: scale,
-                scaleY: scale
+                scaleX: scaleX,
+                scaleY: scaleY
             });
 
             if (bgImageObj) {
@@ -271,7 +292,7 @@ document.getElementById('addText').addEventListener('click', () => {
 });
 
 function createHeadlineGroupMultiLine(textValue = ' ') {
-    const fontSize = 90;
+    const fontSize = 100;
     const lineHeight = 1.3;
     const padX = 20;
     const padY = 10;
@@ -291,7 +312,7 @@ function createHeadlineGroupMultiLine(textValue = ' ') {
         const text = new fabric.Text(safeText, {
             left: padX,
             top: yOffset + padY,
-            fontSize,
+            fontSize: fontSize,
             lineHeight,
             fontFamily: FONT_FAMILY,
             fontWeight: 800,
@@ -389,6 +410,7 @@ function updateMultiLineText(group, newText) {
     // remember old pos
     const oldLeft = group.left;
     const oldTop = group.top;
+    const initialFontSize = group._lineGroups[0] ? group._lineGroups[0]._headlineText.fontSize : 90;
 
     const rawLines = newText.split(/\r?\n/);
     const lines = rawLines.map(l => l.trim() === "" ? " " : l.trim());
@@ -412,7 +434,7 @@ function updateMultiLineText(group, newText) {
         const text = new fabric.Text(safeText, {
             left: padX,
             top: yOffset,
-            fontSize: 90,
+            fontSize: initialFontSize,
             lineHeight: 1.3,
             fontFamily: FONT_FAMILY,
             fontWeight: 800,
@@ -671,10 +693,7 @@ async function piktogramme() {
       });
     }
   }
-  
-  function closePicto() {
-    document.getElementById("picto-overlay").style.display = 'none';
-  }
+
   
 // add svg to canvas
 function addPictogramToCanvas(url) {
@@ -963,66 +982,82 @@ document.addEventListener('keydown', (e) => {
 */
 
 //#endregion
+const scaleSlider = document.getElementById('canvas-size-input');
+const scaleSliderText = document.getElementById('canvas-scale-text')
+scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
+scaleSlider.value = canvasMargin;
+
+scaleSlider.addEventListener('input', () => {
+    canvasMargin = parseFloat(scaleSlider.value);
+    updateCanvasSclae();
+    scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
+});
+//#region Settings
+
+//#endregion
 
 //#region EXPORT
-async function withCleanExport(fn) {
-    const prevSelection = canvas.selection;
+async function exportSharepic(){
+    if (bgImageObj) canvas.sendToBack(bgImageObj);
+
     const active = canvas.getActiveObject();
-    const prevFlags = new Map();
-    canvas.getObjects().forEach(o => {
-        prevFlags.set(o, { hasControls: o.hasControls, hasBorders: o.hasBorders });
-        o.hasControls = false;
-        o.hasBorders  = false;
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
+
+    const json = canvas.toJSON();
+
+    // create off-screen canvas
+    const offscreenEl = document.createElement('canvas');
+    offscreenEl.width = W;
+    offscreenEl.height = H;
+
+    const offscreenCanvas = new fabric.StaticCanvas(offscreenEl, {
+        width: W,
+        height: H,
+        enableRetinaScaling: false
     });
 
-    canvas.selection = false;
-    canvas.discardActiveObject();
-    canvas.renderAll();
-
-    await new Promise(r => requestAnimationFrame(r));
-
-    try {
-        return await fn();
-    } finally {
-        canvas.selection = prevSelection;
-        if (active) canvas.setActiveObject(active);
-        prevFlags.forEach((flags, o) => {
-        o.hasControls = flags.hasControls;
-        o.hasBorders  = flags.hasBorders;
+    // load JSON to offscreen canvas
+    await new Promise(resolve => {
+        offscreenCanvas.loadFromJSON(json, () =>{
+            offscreenCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+            offscreenCanvas.renderAll();
+            resolve();
         });
-        canvas.renderAll();
+    });
+
+    // create blob
+    const blob = await new Promise(resolve => offscreenCanvas.getElement().toBlob(resolve, 'image/jpeg', 0.85));
+    if (!blob){
+        alert('Fehler beim Erstellen des Bildes.');
+        return;
+    }
+
+    // export via flask
+    const form = new FormData();
+    form.append('image', blob, 'sharepic.jpg');
+
+    const res = await fetch('/export_file', { method: 'POST', body: form });
+    const ct = res.headers.get('content-type') || '';
+    if(!res.ok){
+        const msg = ct.includes('application/json') ? (await res.json()).error : await res.text();
+        alert('Export fehlgeschlagen: ' + msg);
+        return;
+    }
+    const jsonRes = await res.json();
+    window.location.href = jsonRes.url;
+
+    if(active) {
+        canvas.setActiveObject(active);
+        canvas.requestRenderAll();
     }
 }
 
-document.getElementById('export').addEventListener('click', async () => {
-    if (bgImageObj) canvas.sendToBack(bgImageObj);
-
-    const result = await withCleanExport(async () => {
-        const htmlCanvas = canvas.getElement();
-
-        const blob = await new Promise(resolve =>
-            htmlCanvas.toBlob(resolve, 'image/jpeg', 0.85)
-        );
-        if (!blob) {
-            alert('Fehler beim Erstellen des Bildes.');
-            return;
-        }
-
-        const form = new FormData();
-        form.append('image', blob, blob.type === 'image/png' ? 'sharepic.png' : 'sharepic.jpg');
-
-        const res = await fetch('/export_file', { method: 'POST', body: form });
-        const ct = res.headers.get('content-type') || '';
-        if (!res.ok) {
-            const msg = ct.includes('application/json') ? (await res.json()).error : await res.text();
-            alert('Export fehlgeschlagen: ' + msg);
-            return;
-        }
-        const json = await res.json();
-        window.location.href = json.url;
+document.getElementById('export').addEventListener('click', () => {
+    exportSharepic().catch(err => {
+        console.log(err);
+        alert('Unbekannter Fehler beim Export.');
     });
-
-    return result;
 });
 
 //#endregion

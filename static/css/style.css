@@ -16,6 +16,22 @@
   font-weight: 600; /* SemiBold */
   font-style: normal;
 }
+:root{
+  --dialog-width: 90%;
+  --dialog-max-width: 700px;
+  --dialog-padding: 28px 36px;
+  --dialog-radius: 10px;
+  --dialog-bg: #f9f7ef;
+  --dialog-font-size: 18px;
+  --dialog-font-weight: 600;
+
+  --cd-gruen: #c7ff7a;
+  --cd-duenkel-gruen: #33c270;
+  --cd-orange: #ff8568;
+  --cd-pink: #f28ade;
+  --cd-lila: #9f88ff;
+}
+
 button, a {transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;}
 html, body{
   margin: 0;
@@ -28,50 +44,66 @@ body {
     padding: 20px;
 }
 
-/** Alter BOX **/
-/* The dark overlay behind the modal */
-#overlay, #picto-overlay, #autopilot-overlay {
-  position: fixed; /* stays on screen even when scrolling */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* dim background */
+#canvas-container { display: flex; position: relative; gap: 12px; }
+#sidebar { width: 260px; padding: 14px; border-left: 1px solid #ececec; background: #fafafa; }
+#stage-container { flex: 1; border: 1px solid #ddd; min-height: 320px; }
+#stage-container {
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  width: 100%;       
+  height: 100%;       
+  border: 1px solid #ccc;
+  position: relative;
+}
+
+/* -------------------------
+   Overlay 
+   ------------------------- */
+#overlay, #picto-overlay, #autopilot-overlay, #settings-overlay {
+  position: fixed;           /* stays on screen when scrolling */
+  inset: 0;                  /* top:0; left:0; right:0; bottom:0 */
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* make sure it’s above everything else */
+  background-color: rgba(0,0,0,0.5);
+  z-index: 9999;
+  padding: 20px;      
   overflow: auto;
 }
 
-/* The modal itself */
-#modalbox, #picto-select-screen, #autopilot-screen{
-  width: 80%;
-  max-width: 700px;
+#modalbox,
+#picto-select-screen,
+#autopilot-screen,
+#settings-screen {
+  width: var(--dialog-width);
+  max-width: var(--dialog-max-width);
+  background: var(--dialog-bg);
+  border-radius: var(--dialog-radius);
+  padding: var(--dialog-padding);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   text-align: center;
-  padding: 80px 60px;
-  font-size: 22px;
-  font-weight: 600;
-  background-color: beige;
-  border-radius: 8px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  font-size: var(--dialog-font-size);
+  font-weight: var(--dialog-font-weight);
+  color: #222;
+  box-sizing: border-box;
 }
 
-#picto-select-screen, #autopilot-screen {
-  width: 80%;
-  max-width: 700px;
-  background: #f9f9f9;
-  padding: 20px 30px;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-  max-height: 90vh;    
-  overflow-y: auto;  
+#picto-select-screen,
+#autopilot-screen,
+#settings-screen {
+  max-height: 85vh;
+  overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
+  scrollbar-color: #cfcfcf transparent;
 }
-#autopilot-screen { 
-  height: 55%;
- }
+
+#autopilot-screen {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
 #pictoGrid {
   display: grid;
@@ -86,84 +118,162 @@ body {
   align-items: center;
   font-size: 12px;
   cursor: pointer;
-  border-radius: 6px;
-  padding: 5px;
+  border-radius: 8px;
+  padding: 8px;
   background: #fff;
-  border: 1px solid #ddd;
-  transition: 0.2s;
+  border: 1px solid #e6e6e6;
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
 }
-
 .picto-item:hover {
-  border-color: #007bff;
-  transform: scale(1.05);
+  transform: translateY(-4px) scale(1.03);
+  border-color: var(--cd-duenkel-gruen);
+  box-shadow: 0 8px 18px rgba(46,164,79,0.08);
 }
-
 .picto-item img {
   width: 60px;
   height: 60px;
   object-fit: contain;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-
-#modalbox button, #picto-select-screen button, #autopilot-screen button {
-  background-color: #33c270;
-  color: #fff;
-  padding: 15px 0;
-  border-radius: 4px;
-  font-size: 20px;
+#autopilot-content textarea {
   width: 100%;
-  border: 0;
-  outline: 0;
-  margin-top: 50px;
-  cursor: pointer;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-}
-  
-#canvas-container {
-    display: flex;
-    position: relative;
-}
-
-#stage-container {
-    flex: 1;
-    border: 1px solid #ccc;
-
-}
-
-#sidebar {
-    width: 20%;
-    padding: 10px;
-    border-left: 1px solid #ccc;
-    background: #f9f9f9;
-}
-
-
-/* AUTOPILOT ***/
-#autopilot-input::placeholder{ font-family: 'Wix Made For Display'; font-size: 16px; }
-#autopilot-next, #autopilot-prev, #closeAutopilotBtn { max-width: 20%; }
-#autopilot-next:hover, #autopilot-prev:hover, #closeAutopilotBtn:hover { transform: scale(1.03); }
-#autopilot-content textarea { 
-  width: 280px;
+  max-width: 420px;
   height: 130px;
-  padding: 12px 20px;
+  padding: 12px 14px;
   box-sizing: border-box;
-  border: 2px solid #ccc;
-  border-radius: 4px;
-  background-color: #f8f8f8;
+  border: 2px solid #e6e6e6;
+  border-radius: 8px;
+  background-color: #fff;
   resize: none;
+  margin: 6px auto;
+  display: block;
+  font-family: inherit;
+  font-size: 15px;
 }
 #autopilot-content input[type=text] {
-  width: 280px;
-  padding: 12px;
-  margin: 10px 0;
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  margin: 10px auto;
   box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  display: block;
 }
-.autopilot-export-container {
-    margin-top: 1.2rem;
-    padding: 0.5rem 0;
-    font-size: 1rem;
+#settings-screen input[type=range] {
+  width: 100%;
+  max-width: 420px;
+  margin: 20px auto;
+  display: block;
+
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: transparent;
 }
-.autopilot-export-container input {
-    margin-right: 0.5rem;
+#settings-screen input[type=range]::-webkit-slider-runnable-track{
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--cd-gruen) 0%,
+    var(--cd-orange) 30%,
+    var(--cd-pink) 60%,
+    var(--cd-lila) 100%
+  );
+}
+#settings-screen input[type=range]::-moz-range-track{
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--cd-gruen) 0%,
+    var(--cd-orange) 30%,
+    var(--cd-pink) 60%,
+    var(--cd-lila) 100%
+  );
+}
+#settings-screen input[type=range]::-ms-track{
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    var(--cd-gruen) 0%,
+    var(--cd-orange) 30%,
+    var(--cd-pink) 60%,
+    var(--cd-lila) 100%
+  );
+  border-color: transparent;
+  color: transparent;
+}
+
+#settings-screen input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+
+  height: 20px;
+  width: 20px;
+  /*background: var(--cd-duenkel-gruen); */
+  background: var(--thumb-bg);
+
+  transform: translateY(-8px);
+
+  cursor: grab;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.25);
+}
+
+#settings-screen input[type=range]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.35);
+}
+#settings-screen input[type=range]::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+
+  background: var(--thumb-bg);
+  
+  cursor: grab;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.25);
+}
+
+#settings-screen input[type=range]::-moz-range-thumb:active {
+  cursor: grabbing;
+}
+
+#settings-screen input[type=range]::-ms-thumb {
+  height: 20px;
+  width: 20px;
+
+  background: var(--thumb-bg);
+
+  cursor: grab;
+}
+
+
+/* -------------------------
+   Responsive 
+   ------------------------- */
+@media (min-width: 900px) {
+  #modalbox,
+  #picto-select-screen,
+  #autopilot-screen,
+  #settings-screen {
+    --dialog-width: 70%;
+    --dialog-max-width: 820px;
+    --dialog-padding: 36px 48px;
+    --dialog-font-size: 20px;
+  }
+  #sidebar { width: 300px; }
+}
+
+@media (max-width: 520px) {
+  #modalbox,
+  #picto-select-screen,
+  #autopilot-screen,
+  #settings-screen {
+    --dialog-padding: 18px 16px;
+    font-size: 16px;
+  }
+  .autopilot-buttons { flex-direction: column; }
+  .autopilot-buttons button { width: 100%; max-width: none; }
 }

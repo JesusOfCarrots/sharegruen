@@ -111,3 +111,70 @@ header button:hover{opacity: 0.9; transform: scale(1.03);}
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
 }
+
+
+#modalbox button,
+#picto-select-screen button,
+#autopilot-screen button,
+.autopilot-buttons button,
+.closeBtn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  outline: 0;
+  background-color: #33c270;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.12);
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  width: 100%;
+  max-width: 420px;
+  margin: 20px auto 0;
+  display: inline-block;
+  text-align: center;
+}
+#modalbox button:hover,
+#picto-select-screen button:hover,
+#autopilot-screen button:hover,
+.autopilot-buttons button:hover,
+.closeBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(0,0,0,0.14);
+}
+
+.autopilot-buttons button {
+  width: auto;
+  padding: 10px 14px;
+  margin: 0 6px;
+  max-width: none;
+}
+.autopilot-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+label[for="bgSelect"]{
+  display: inline-flex;
+  align-items: center;
+  grid-area: 6px;
+}
+#settings-btn{
+  all: unset;
+  transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;
+
+  background-image: url(../img/settings.svg);
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  height: 32px;
+  width: 32px;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+}
+#settings-btn:hover{ opacity: 0.9; transform: scale(1.03); }
