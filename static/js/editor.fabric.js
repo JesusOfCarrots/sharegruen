@@ -118,7 +118,8 @@ if (firstThumb) {
 
 //#region SIDEBAR
 let selected = null;
-const propBox = document.getElementById('properties');
+const isMobile = window.innerWidth < 768;
+const propBox = isMobile ? document.getElementById('mobProperties') : document.getElementById('properties');
 
 function clearProps() {
     propBox.innerHTML = '<p>Wähle ein Element aus, um es zu bearbeiten.</p>';
@@ -134,6 +135,8 @@ function addLabelInput(labelText, inputEl) {
 }
 
 function showProps(obj) {
+    if(isMobile) openPropertiesDrawer();
+
     propBox.innerHTML = '';
 
     // POS 
@@ -997,7 +1000,275 @@ scaleSlider.addEventListener('input', () => {
     updateCanvasSclae();
     scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
 });
-//#region Settings
+
+//#region Mobile Menu
+//Drawer
+const drawer = document.getElementById('mobilePropertiesDrawer');
+const drawerHandle = document.getElementById('drawerHandle');
+
+function openPropertiesDrawer(){
+    drawer.classList.add('expanded');
+    drawer.setAttribute('aria-hidden', 'false');
+}
+function closePropertiesDrawer(){
+    drawer.classList.remove('expanded');
+    drawer.setAttribute('aria-hidden', 'true');
+}
+function togglePropertiesDrawer(){
+    drawer.classList.toggle('expanded');
+    drawer.setAttribute('aria-hidden', !drawer.classList.contains('expanded'));
+}
+
+let startY = 0;
+let startHeight = 0;
+let isDragging = false;
+
+function onTouchStart(e) {
+    if (!e.touches || e.touches.length === 0) return;
+    isDragging = true;
+    startY = e.touches[0].clientY;
+    startHeight = drawer.getBoundingClientRect().height;
+    drawerHandle.style.cursor = 'grabbing';  
+}
+function onTouchMove(e){
+    if (!isDragging || !e.touches || e.touches.length === 0) return;
+    const dy = startY - e.touches[0].clientY;
+    let newHeight = startHeight + dy;
+    const minH = 80;
+    const maxH = window.innerHeight * 0.72;
+    newHeight = Math.max(minH, Math.min(maxH, newHeight));
+    drawer.style.height = newHeight + 'px';
+}
+function onTouchEnd(e){
+    if (!isDragging) return;
+    isDragging = false;
+    drawerHandle.style.cursor = 'grab';
+
+    const finalH = parseInt(drawer.style.height || drawer.getBoundingClientRect().height, 10);
+    if (finalH > window.innerHeight * 0.35){
+        openPropertiesDrawer();
+        drawer.style.height = '';
+    }else{
+        closePropertiesDrawer();
+        drawer.style.height = '';
+    }
+}
+drawerHandle.addEventListener('touchstart', onTouchStart, { passive: true });
+drawerHandle.addEventListener('touchmove', onTouchMove, { passive: false });
+drawerHandle.addEventListener('touchend', onTouchEnd, { passive: true });
+
+drawerHandle.addEventListener('click', (e) => {
+    if (!isDragging) togglePropertiesDrawer();
+});
+
+if(typeof canvas !== 'undefined'){
+    canvas.on('selection:created', (evt) => {
+        const obj = evt.target || canvas.getActiveObject();
+        if(obj){
+            showProps(obj);
+        }
+    });
+
+    canvas.on('selection:updated', (evt) => {
+        const obj = evt.target || canvas.getActiveObject();
+        if(obj){
+            showProps(obj);
+        }
+    });
+
+    canvas.on('selection:cleared', () => {
+        if(window.innerWidth < 768){
+            closePropertiesDrawer();
+        }
+        const p = document.getElementById('properties');
+        if (p) p.innerHTML = '<p>Wähle ein Element aus, um es zu bearbeiten.</p>';
+    });
+} else {
+    console.warn('canvas ist nicht definiert – Fabric-Hooks wurden nicht registriert.')
+}
+
+
+function initMobileDrawer(){
+    attachBgThumbClicks();
+
+    canvasMargin = 1;
+    scaleSlider.value = canvasMargin;
+    updateCanvasSclae();
+    scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
+}
+
+const propertiesDrawer = document.getElementById('mobilePropertiesDrawer');
+function openDrawerMain(){
+    const sidebar = document.getElementById('mobileSidebar');
+    const menuBtn = document.getElementById('mobileMenuBtn');
+
+    sidebar.style.width = '320px';
+    sidebar.setAttribute('aria-hidden', 'false');
+    document.getElementById('drawerMain').style.display = 'block';
+    document.getElementById('drawerSub').style.display = 'none';
+    document.getElementById('drawerTitle').innerText = 'Kategorien';
+    menuBtn.style.display = 'none';
+    document.getElementById('mobileTopBar').style.display = 'none';
+    propertiesDrawer.style.display = 'none';
+}
+function closeDrawer(){
+    const sidebar = document.getElementById('mobileSidebar');
+    const menuBtn = document.getElementById('mobileMenuBtn');
+
+    sidebar.style.width = '0';
+    sidebar.setAttribute('aria-hidden', 'true');
+    menuBtn.style.display = 'grid';
+    document.getElementById('mobileTopBar').style.display = 'flex';
+    propertiesDrawer.style.display = 'block';
+}
+
+function openDrawerSub(category, event){
+    if(event) event.preventDefault();
+    document.getElementById('drawerMain').style.display = 'none';
+    document.getElementById('drawerSub').style.display = 'block';
+    document.getElementById('drawerTitle').innerText = category.charAt(0).toUpperCase() + category.slice(1);
+    populateSubmenu(category);
+    const sidebar = document.getElementById('mobileSidebar');
+    if (!sidebar.style.width || sidebar.style.width === '0px'){
+        sidebar.style.width = '320px';
+    } 
+}
+
+function backToMain(){
+    document.getElementById('drawerSub').style.display = 'none';
+    document.getElementById('drawerMain').style.display = 'block';
+    document.getElementById('drawerTitle').innerText = 'Kategorien';
+}
+
+/* Fill Sub Menu */
+function populateSubmenu(category){
+    const drawerSub = document.getElementById('drawerSub');
+    drawerSub.innerHTML = ''; //clear
+
+    const back = document.createElement('div');
+    back.className = 'back-btn';
+    back.innerHTML = '◀ Zurück';
+    back.onclick = backToMain;
+    drawerSub.appendChild(back);
+
+    if(category === 'backgrounds'){
+        const bgThumbs = Array.from(document.querySelectorAll('.bg-options .bg-thumb'));
+        if(bgThumbs.length === 0){
+            const p = document.createElement('p');
+            p.style.padding = '12px';
+            p.innerText = 'Keine Hintergründe gefunden.';
+            drawerSub.appendChild(p);
+        }else{
+            bgThumbs.forEach((imgEl, idx) => {
+                const item = document.createElement('div');
+                item.className = 'sub-item';
+                const thumb = imgEl.cloneNode();
+                thumb.classList.add('thumb');
+                item.appendChild(thumb);
+                const lbl = document.createElement('div');
+                lbl.className = 'label';
+                lbl.innerText = imgEl.dataset.src || `Hintergrund ${idx+1}`;
+                item.appendChild(lbl);
+                item.onclick = function(e){
+                    e.preventDefault();
+                    imgEl.click();
+                    //dsdsdsdsdsdsd
+                    closeDrawer();
+                };
+                drawerSub.appendChild(item);
+            });
+        }
+    } else if(category === 'texts'){
+        const addTextBtn = document.createElement('div');
+        addTextBtn.className = 'sub-item';
+        addTextBtn.innerHTML = '<div class="label">Text hinzufügen</div>';
+        addTextBtn.onclick = function(){ if(typeof addText === 'function') addText(); else document.getElementById('addText').click(); };
+        drawerSub.appendChild(addTextBtn);
+
+        const addHeadlineBtn = document.createElement('div');
+        addHeadlineBtn.className = 'sub-item';
+        addHeadlineBtn.innerHTML = '<div class="label">Headline mit CD-Hinterlegung</div>';
+        addHeadlineBtn.onclick = function(){ if(typeof addHeadline === 'function') addHeadline(); else document.getElementById('addHeadline').click(); };
+        drawerSub.appendChild(addHeadlineBtn);
+    } else if (category === 'images'){
+        const pictogramBtn = document.createElement('div');
+        pictogramBtn.className = 'sub-item';
+        pictogramBtn.innerHTML = '<div class="label">Piktogramme</div>';
+        pictogramBtn.onclick = function() { if(typeof piktogramme === 'function') piktogramme(); else document.getElementById('addPicto').click(); };
+        drawerSub.appendChild(pictogramBtn);
+
+        const addImgBtn = document.createElement('div');
+        addImgBtn.className = 'sub-item';
+        addImgBtn.innerHTML = '<div class="label">Bild hochladen</div>';
+        addImgBtn.onclick = function(){ const input = document.getElementById('imgUploadInput'); if(input) input.click(); else if(typeof addImg === 'function') addImg(); };
+        drawerSub.appendChild(addImgBtn);
+    } else if (category === 'kv') {
+        const kvWrapper = document.createElement('div');
+        kvWrapper.style.display = 'flex';
+        kvWrapper.style.flexDirection = 'column';
+        kvWrapper.style.gap = '8px';
+        kvWrapper.style.padding = '6px';
+        const input = document.createElement('input');
+        input.id = 'kvInputMobile';
+        input.placeholder = 'Duisburg';
+        input.style.padding = '10px';
+        input.style.borderRadius = '6px';
+        input.style.border = '1px solid rgba(255,255,255,0.06)';
+        input.style.background = 'transparent';
+        input.style.color = '#fff';
+        const btn = document.createElement('button');
+        btn.className = 'sub-item';
+        btn.style.width = '100%';
+        btn.style.justifyContent = 'center';
+        btn.innerText = 'Logo einfügen';
+        btn.onclick = function(){
+            const kv = (document.getElementById('kvInputMobile') && document.getElementById('kvInputMobile').value.trim()) || document.getElementById('kvInput').value.trim();
+            if (kv){
+                if (typeof addKVLogo === 'function') addKVLogo(kv);
+                else if (typeof addKV === 'function') addKV(kv);
+                else document.getElementById('setKV').click();
+            }
+        };
+        kvWrapper.appendChild(input);
+        kvWrapper.appendChild(btn);
+        drawerSub.appendChild(kvWrapper);
+    }
+}
+
+function attachBgThumbClicks(){
+    const thumbs = document.querySelectorAll('.bg-options .bg-thumb');
+    thumbs.forEach(img => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => {
+            if (typeof applyBackgroundFromThumb === 'function') {
+                applyBackgroundFromThumb(img.dataset.src || img.src);
+            } else{
+                try {
+                    if(window.canvas && img.dataset && img.dataset.src){
+                        const url = `/static/backgrounds/${img.dataset.src}`;
+                        canvas.setBackgroundImage(url, canvas.renderAll.bind(canvas), { originX: 'left', originY: 'top', width: canvas.width, height: canvas.height });
+                    }
+                } catch(e){
+                    console.log('No fabric canvas instance found or applyBackgroundFromThumb not defined.');
+                }
+            }
+        });
+    });
+}
+
+document.addEventListener('click', function(e){
+    const sidebar = document.getElementById('mobileSidebar');
+    const btn = document.getElementById('mobileMenuBtn');
+    if (!sidebar || !btn) return;
+    if (sidebar.style.width && sidebar.style.width !== '0px'){
+        const isClickInside = sidebar.contains(e.target) || btn.contains(e.target);
+        if(!isClickInside) closeDrawer();
+    }
+});
+
+window.addEventListener('load', function() {
+    initMobileDrawer();
+});
 
 //#endregion
 

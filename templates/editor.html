@@ -10,66 +10,105 @@
   <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
 </head>
 
-<header>
-    <div class="toolbar">
+<body onload="showModal()">
+    <header>
+        <!-- Mobile Drawer -->
+        <nav id="mobileSidebar" class="mobile-sidebar" aria-hidden="true">
+            <div class="drawer-header">
+                <div class="title" id="drawerTitle">Kategorien</div>
+                <div>
+                <button class="close-btn" onclick="closeDrawer()" aria-label="Schließen">✕</button>
+                </div>
+            </div>
 
-        <div class="tool-group">
-            <label for="bgSelect">Hitergrund: <button id="settings-btn" onclick="openSettings()"></button></label>
-            <div class="bg-options">
-                <img src="/static/backgrounds/GJ_dunkelGruen.png" data-src="GJ_dunkelGruen.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Gruen.png" data-src="GJ_Gruen.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Lila.png" data-src="GJ_Lila.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Orange.png" data-src="GJ_Orange.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Pink.png" data-src="GJ_Pink.png" class="bg-thumb">
+            <!-- MAIN: Kategorien -->
+            <div class="drawer-main" id="drawerMain" role="menu" aria-label="Kategorien Menu">
+                <a class="category-link" href="#" onclick="openDrawerSub('backgrounds', event)">Hintergründe</a>
+                <a class="category-link" href="#" onclick="openDrawerSub('texts', event)">Textelemente</a>
+                <a class="category-link" href="#" onclick="openDrawerSub('images', event)">Bildelemente</a>
+                <a class="category-link" href="#" onclick="openDrawerSub('kv', event)">Kreisverband</a>
 
-                <img src="/static/backgrounds/GJ_Verlaufe_IG1.png" data-src="GJ_Verlaufe_IG1.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG2.png" data-src="GJ_Verlaufe_IG2.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG3.png" data-src="GJ_Verlaufe_IG3.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG4.png" data-src="GJ_Verlaufe_IG4.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG5.png" data-src="GJ_Verlaufe_IG5.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG6.png" data-src="GJ_Verlaufe_IG6.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG7.png" data-src="GJ_Verlaufe_IG7.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG8.png" data-src="GJ_Verlaufe_IG8.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG9.png" data-src="GJ_Verlaufe_IG9.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG10.png" data-src="GJ_Verlaufe_IG10.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG11.png" data-src="GJ_Verlaufe_IG11.png" class="bg-thumb">
-                <img src="/static/backgrounds/GJ_Verlaufe_IG12.png" data-src="GJ_Verlaufe_IG12.png" class="bg-thumb">
+                <button id="settings-btn" onclick="openSettings()" style="background-color: #fff; transform: scale(1.5); position: relative; margin-top: 100%;"></button>
+                <button id="export" style="float: right; position: relative; margin-top: 100%;">Exportieren (PNG)</button>
+            </div>
 
+            <div class="drawer-sub" id="drawerSub" role="menu" aria-label="Untermenü" style="display:none;">
+                <!-- JS fills Items -->
+            </div>
+        </nav>
+
+        <div class="toolbar">
+            <div class="tool-group">
+                <label for="bgSelect">Hitergrund: <button id="settings-btn" onclick="openSettings()"></button></label>
+                <div class="bg-options">
+                    <img src="/static/backgrounds/GJ_dunkelGruen.png" data-src="GJ_dunkelGruen.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Gruen.png" data-src="GJ_Gruen.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Lila.png" data-src="GJ_Lila.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Orange.png" data-src="GJ_Orange.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Pink.png" data-src="GJ_Pink.png" class="bg-thumb">
+
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG1.png" data-src="GJ_Verlaufe_IG1.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG2.png" data-src="GJ_Verlaufe_IG2.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG3.png" data-src="GJ_Verlaufe_IG3.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG4.png" data-src="GJ_Verlaufe_IG4.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG5.png" data-src="GJ_Verlaufe_IG5.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG6.png" data-src="GJ_Verlaufe_IG6.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG7.png" data-src="GJ_Verlaufe_IG7.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG8.png" data-src="GJ_Verlaufe_IG8.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG9.png" data-src="GJ_Verlaufe_IG9.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG10.png" data-src="GJ_Verlaufe_IG10.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG11.png" data-src="GJ_Verlaufe_IG11.png" class="bg-thumb">
+                    <img src="/static/backgrounds/GJ_Verlaufe_IG12.png" data-src="GJ_Verlaufe_IG12.png" class="bg-thumb">
+
+                </div>
+            </div>
+
+            <div class="tool-group">
+                <label for="kvInput">Kreisverband:</label>
+                <input type="text" id="kvInput" placeholder="Duisburg">
+                <button id="setKV">Logo einfügen</button>
+            </div>
+
+            <div class="tool-group">
+                <button id="addText">Text hinzufuegen</button>
+                <button id="addHeadline">Headline mit CD-Hinterlegung</button>
+                <button id="addPicto" onclick="piktogramme()">Pictogram Hinzuügen</button>
+                <button id="addImg">Bild Hinzuügen</button>
+                <input type="file" id="imgUploadInput" accept="image/*" style="display: none;"> <!-- Hide -> Button trigger -->
+            </div>
+
+            <div class="tool-group">
+                <button id="export">Exportieren (PNG)</button> <br>
+                <button id="autopilotStart" onclick="startAutopilotDialouge()"><span>Autopilot</span></button>
             </div>
         </div>
+    </header>
 
-        <div class="tool-group">
-            <label for="kvInput">Kreisverband:</label>
-            <input type="text" id="kvInput" placeholder="Duisburg">
-            <button id="setKV">Logo einfügen</button>
-        </div>
-
-        <div class="tool-group">
-            <button id="addText">Text hinzufuegen</button>
-            <button id="addHeadline">Headline mit CD-Hinterlegung</button>
-            <button id="addPicto" onclick="piktogramme()">Pictogram Hinzuügen</button>
-            <button id="addImg">Bild Hinzuügen</button>
-            <input type="file" id="imgUploadInput" accept="image/*" style="display: none;"> <!-- Hide -> Button trigger -->
-        </div>
-
-        <div class="tool-group">
-            <button id="export">Exportieren (PNG)</button> <br>
-            <button id="autopilotStart" onclick="startAutopilotDialouge()"><span>Autopilot</span></button>
-        </div>
-            
+    <div class="mobile-top-bar" id="mobileTopBar">
+        <div class="mobile-menu-icon" id="mobileMenuBtn" onclick="openDrawerMain()" aria-label="Menü öffnen">☰</div>
+        <button id="mobileAutopilotBtn" onclick="startAutopilotDialouge()">
+            <span>Autopilot</span>
+        </button>
     </div>
-</header>
-
-<body onload="showModal()">
 
     <div id="canvas-container">
         <div id="stage-container">
             <canvas id="editorCanvas" width="{{width}}" height="{{height}}"></canvas>
         </div>
+
         <div id="sidebar">
             <h3>Eigenschaften</h3>
             <div id="properties">
                 <p>Wähle ein Element aus, um es zu bearbeiten.</p>
+            </div>
+        </div>
+        <div id="mobilePropertiesDrawer" aria-hidden="true">
+            <div class="drawer-handle" id="drawerHandle"></div>
+            <div class="drawer-content">
+                <h3>Eigenschaften</h3>
+                <div id="mobProperties">
+                    <p>Wähle ein Element aus, um es zu bearbeiten.</p>
+                </div>
             </div>
         </div>
     </div>

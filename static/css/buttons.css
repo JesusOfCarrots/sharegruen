@@ -13,17 +13,17 @@ header button {
 }
 header button:hover{opacity: 0.9; transform: scale(1.03);}
 
-.toolbar {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 10px;
-    overflow-x: auto;
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 10px;
-    border-radius: 8px;
+.toolbar, .mobile-toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  overflow-x: auto;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .tool-group{
@@ -39,18 +39,18 @@ header button:hover{opacity: 0.9; transform: scale(1.03);}
 }
 
 .bg-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .bg-thumb {
-    width: 60px;
-    height: 40px;
-    object-fit: cover;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: border 0.2s;
+  width: 60px;
+  height: 40px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.2s;
 }
 
 .bg-thumb:hover, .bg-thumb.selected {
@@ -69,9 +69,19 @@ header button:hover{opacity: 0.9; transform: scale(1.03);}
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   z-index: 0;
 }
+#mobileAutopilotBtn{
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  background: #33c270; /* base button color */
+  font-weight: 700;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
 
 /* animated rainbow edge */
-#autopilotStart::before {
+#autopilotStart::before, #mobileAutopilotBtn::before {
   content: "";
   position: absolute;
   inset: -2px; /* slightly outside to look like an outer border */
@@ -95,7 +105,7 @@ header button:hover{opacity: 0.9; transform: scale(1.03);}
 }
 
 /* subtle glowing effect (optional but beautiful) */
-#autopilotStart::after {
+#autopilotStart::after, #mobileAutopilotBtn::after {
   content: "";
   position: absolute;
   inset: -4px;
@@ -168,9 +178,9 @@ label[for="bgSelect"]{
   all: unset;
   transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;
 
-  background-image: url(../img/settings.svg);
-  background-repeat: no-repeat;
-  background-position: 50% 50%;
+  -webkit-mask: url(../img/navigation/settings.svg) no-repeat center;
+  mask: url(../img/navigation/settings.svg) no-repeat center;
+  background-color: #000;
   height: 32px;
   width: 32px;
   border: none;
