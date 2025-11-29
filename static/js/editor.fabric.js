@@ -1091,10 +1091,12 @@ if(typeof canvas !== 'undefined'){
 function initMobileDrawer(){
     attachBgThumbClicks();
 
-    canvasMargin = 1;
-    scaleSlider.value = canvasMargin;
-    updateCanvasSclae();
-    scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
+    if(isMobile){
+        canvasMargin = 1;
+        scaleSlider.value = canvasMargin;
+        updateCanvasSclae();
+        scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
+    }
 }
 
 const propertiesDrawer = document.getElementById('mobilePropertiesDrawer');
@@ -1177,6 +1179,9 @@ function populateSubmenu(category){
                 };
                 drawerSub.appendChild(item);
             });
+            const spacer = document.createElement('div');
+            spacer.className = 'sub-item-spacer';
+            drawerSub.appendChild(spacer);
         }
     } else if(category === 'texts'){
         const addTextBtn = document.createElement('div');
