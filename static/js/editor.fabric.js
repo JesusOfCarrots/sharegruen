@@ -1334,7 +1334,8 @@ async function exportSharepic(){
     }
 }
 
-document.getElementById('export').addEventListener('click', () => {
+let exportBtn = isMobile ? document.getElementById('mobExportBtn') : document.getElementById('export');
+exportBtn.addEventListener('click', () => {
     exportSharepic().catch(err => {
         console.log(err);
         alert('Unbekannter Fehler beim Export.');
