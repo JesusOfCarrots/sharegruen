@@ -8,7 +8,10 @@ const canvas = new fabric.Canvas('editorCanvas', {
     height: H,
     enableRetinaScaling: false 
 });
-
+canvas.upperCanvasEl.style.width = `${W}px`;
+canvas.upperCanvasEl.style.height = `${H}px`;
+canvas.lowerCanvasEl.style.width = `${W}px`;
+canvas.lowerCanvasEl.style.height = `${H}px`;
 canvas.setDimensions({ width: W, height: H });
 
 const stageContainer = document.getElementById('stage-container');
@@ -25,9 +28,15 @@ function updateCanvasSclae(){
     );
 
     scaleFactor = scale;
-    canvas.setZoom(scaleFactor);
-    canvas.calcOffset();
+    //canvas.setZoom(scaleFactor);
+    //canvas.calcOffset();
+    canvas.upperCanvasEl.style.transform = `scale(${scaleFactor})`;
+    canvas.lowerCanvasEl.style.transform = `scale(${scaleFactor})`;
 
+    canvas.upperCanvasEl.style.transformOrigin = "top left";
+    canvas.lowerCanvasEl.style.transformOrigin = "top left";
+
+    canvas.calcOffset();
     canvas.requestRenderAll();
 }
 updateCanvasSclae();
@@ -62,36 +71,22 @@ function loadBackground(src) {
         fabric.Image.fromURL(imgURL, (img) => {
             const cw = canvas.getWidth();
             const ch = canvas.getHeight();
-            const scaleX = cw / img.width;
-            const scaleY = ch / img.height;
 
-            img.set({
-                left: 0,
-                top: 0,
+            const scale = Math.max(
+                cw / img.width,
+                ch / img.height
+            );
+
+            canvas.setBackgroundImage(img, canvas.requestRenderAll.bind(canvas), {
+                scaleX: scale,
+                scaleY: scale,
                 originX: 'left',
-                originY: 'top',
-                selectable: false,
-                evented: false,
-                scaleX: scaleX,
-                scaleY: scaleY
+                originY: 'top'
             });
 
-            if (bgImageObj) {
-                canvas.remove(bgImageObj);
-            }
-            img._bgSrc = src;
-            
-            bgImageObj = img;
-            canvas.add(bgImageObj);
-            canvas.sendToBack(bgImageObj);
-            canvas.requestRenderAll();
-
-            // update Logo color
             const isDark = DARK_BACKGROUNDS.includes(src);
             const variant = isDark ? 'light' : 'dark';
             updateKVLogoVariant(variant);
-
-            // Update Bar color
             refreshAllHeadlineBarColors();
 
             resolve(variant);
@@ -1334,8 +1329,7 @@ async function exportSharepic(){
     }
 }
 
-let exportBtn = isMobile ? document.getElementById('mobExportBtn') : document.getElementById('export');
-exportBtn.addEventListener('click', () => {
+document.getElementById('export').addEventListener('click', () => {
     exportSharepic().catch(err => {
         console.log(err);
         alert('Unbekannter Fehler beim Export.');
