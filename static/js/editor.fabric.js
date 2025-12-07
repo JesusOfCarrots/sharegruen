@@ -84,6 +84,13 @@ function loadBackground(src) {
                 originY: 'top'
             });
 
+            if (bgImageObj) {
+                canvas.remove(bgImageObj);
+            }
+            img._bgSrc = src;
+            
+            bgImageObj = img;
+
             const isDark = DARK_BACKGROUNDS.includes(src);
             const variant = isDark ? 'light' : 'dark';
             updateKVLogoVariant(variant);
