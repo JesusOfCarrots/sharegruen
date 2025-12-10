@@ -141,6 +141,25 @@ function showProps(obj) {
 
     propBox.innerHTML = '';
 
+    //DEL
+    if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox || obj instanceof fabric.Image){
+        const delBtn = document.createElement('button');
+        delBtn.classList.add('delBtn');
+        delBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path fill="currentColor" 
+                d="M 10.8 3.6 v 1.2 H 4.8 v 2.4 h 1.2 v 15.6 a 2.4 2.4 90 0 0 2.4 2.4 h 12 a 2.4 2.4 90 0 0 2.4 -2.4 V 7.2 h 1.2 V 4.8 h -6 V 3.6 H 10.8 z m 2.4 4.8 v 12 h 2.4 V 8.4 h -2.4 z m -4.8 0 v 12 h 2.4 V 8.4 H 8.4 z m 9.6 0 v 12 h 2.4 V 8.4 h -2.4 z" />
+        </svg>
+        `;
+
+
+        delBtn.addEventListener('click', () => {
+            canvas.remove(canvas.getActiveObject());
+            canvas.requestRenderAll();
+        });
+        addLabelInput('Element löschen', delBtn);
+    }
+
     // POS 
     if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox || obj instanceof fabric.Image) {
         // X
@@ -1005,7 +1024,7 @@ scaleSlider.addEventListener('input', () => {
 
 //#region Mobile
 if(isMobile){
-    fabric.Object.prototype.cornerSize = 30;
+    fabric.Object.prototype.cornerSize = 40;
     fabric.Object.prototype.cornerStyle = "circle";
     fabric.Object.prototype.transparentCorners = false;
 }

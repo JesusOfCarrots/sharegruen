@@ -57,6 +57,23 @@ header button:hover{opacity: 0.9; transform: scale(1.03);}
     border: 2px solid #007bff;
 }
 
+.delBtn {
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.delBtn svg {
+  pointer-events: none;
+}
+
 /* Animate Autopilot Button */
 #autopilotStart {
   position: relative;
