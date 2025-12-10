@@ -1003,7 +1003,12 @@ scaleSlider.addEventListener('input', () => {
     scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
 });
 
-//#region Mobile Menu
+//#region Mobile
+if(isMobile){
+    fabric.Object.prototype.cornerSize = 30;
+    fabric.Object.prototype.cornerStyle = "circle";
+    fabric.Object.prototype.transparentCorners = false;
+}
 //Drawer
 const drawer = document.getElementById('mobilePropertiesDrawer');
 const drawerHandle = document.getElementById('drawerHandle');
