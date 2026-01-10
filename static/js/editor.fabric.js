@@ -268,7 +268,7 @@ function showProps(obj) {
             addLabelInput('Balkenfarbe:', barSelect);
         }
     }
-
+    
     // SVG Color
     if (obj._isPictogram) { 
         const svgColor = document.createElement('input'); 
@@ -1303,7 +1303,7 @@ window.addEventListener('load', function() {
 
 //#endregion
 
-//#region EXPORT
+//#region EXPORT as PNG
 async function exportSharepic(){
     if (bgImageObj) canvas.sendToBack(bgImageObj);
 
@@ -1367,5 +1367,115 @@ exportBtn.addEventListener('click', () => {
         alert('Unbekannter Fehler beim Export.');
     });
 });
-
 //#endregion
+
+//#region EXPORT/IMPORT as JSON
+document.getElementById("export-json").addEventListener('click', () => {
+    const json = JSON.stringify(canvas.toJSON([
+        '_isHeadlineGroup',
+        '_isHeadlineChild',
+        '_lineGroups',
+        '_headlineText',
+        '_parentGroup',
+        '_isPictogram',
+        '_bgSrc',
+        '_barRect',
+        '_isHeadlineLine',
+        '_isKVLogo'
+    ]));
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "canvas.json";
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+// Trigger file input for import
+document.getElementById("import-json").addEventListener('click', () => {
+    document.getElementById("jsonFileInput").click();
+});
+
+// Read and load JSON into canvas
+document.getElementById("jsonFileInput").addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        canvas.loadFromJSON(json, () => {
+            restoreHeadlines(canvas, json);
+            canvas.renderAll();
+        });
+
+      } catch (err) {
+        alert("Fehler beim Laden der JSON-Datei: " + err);
+      }
+    };
+    reader.readAsText(file);
+});
+function restoreHeadlines(canvas, jsonStr) {
+    canvas.getObjects().forEach(obj => {
+        if (obj.type === 'group' && obj._isHeadlineGroup) {
+
+            let left = obj.left;
+            let top = obj.top;
+
+            obj._lineGroups = [];
+
+            obj._objects.forEach(lg => {
+                if (!lg._objects || lg._objects.length !== 2) return;
+
+                const bar = lg._objects.find(o => o.type === 'rect');
+                const text = lg._objects.find(o => o.type === 'text');
+
+                if (!bar || !text) return;
+
+                lg._isHeadlineLine = true;
+                lg._barRect = bar;
+                lg._headlineText = text;
+
+                let content = text.text;
+                text.text = "";
+
+                // restore events
+                text.on("changed", () => updateMultiLineHeadline(obj));
+                text.on("modified", () => updateMultiLineHeadline(obj));
+
+                text.text = content;
+                obj._lineGroups.push(lg);
+            });
+
+            // force recalculation
+            obj._calcBounds();
+            obj._updateObjectsCoords();
+            obj.set({
+                top: top,
+                left: left
+            });
+        }
+        if(obj._isKVLogo){
+            const kvGroup = jsonStr.objects.find(o => o._isKVLogo);
+            const textObj = kvGroup?.objects.find(o => o.type === "text");
+
+            addKVLogo(textObj?.text);
+            const isDark = DARK_BACKGROUNDS.includes(bgImageObj._bgSrc);
+            const variant = isDark ? 'light' : 'dark';
+            updateKVLogoVariant(variant);
+            obj.remove();
+        }
+    });
+
+    loadBackground(jsonStr.backgroundImage._bgSrc);
+    document.querySelectorAll('.bg-thumb').forEach(th => {
+        if(th.dataset.src === jsonStr.backgroundImage._bgSrc){
+            th.classList.add('selected');
+        }
+        else{
+            th.classList.remove('selected');
+        }
+    });
+}
