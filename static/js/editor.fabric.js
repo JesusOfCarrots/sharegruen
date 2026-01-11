@@ -1386,8 +1386,10 @@ document.getElementById("export-json").addEventListener('click', () => {
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
+    let headlineEl = canvas.getObjects().find(o => o.type === 'group' && o._isHeadlineGroup);
+    let fileName = headlineEl?._lineGroups[0]?._headlineText?.text; // make the file name the text of the first headline
     a.href = url;
-    a.download = "canvas.json";
+    a.download = fileName ? fileName.replace(/\s/g, '') : "canvas" + ".json";
     a.click();
     URL.revokeObjectURL(url);
 });
@@ -1426,28 +1428,48 @@ function restoreHeadlines(canvas, jsonStr) {
 
             obj._lineGroups = [];
 
-            obj._objects.forEach(lg => {
-                if (!lg._objects || lg._objects.length !== 2) return;
+            const hasLineGroups = obj._objects.some(o => o.type === 'group'); // multi-line Headline or single-line headline?
 
-                const bar = lg._objects.find(o => o.type === 'rect');
-                const text = lg._objects.find(o => o.type === 'text');
+            if(hasLineGroups){ // multi line Headline
+                obj._objects.forEach(lg => {
+                    if (!lg._objects || lg._objects.length !== 2) return;
 
-                if (!bar || !text) return;
+                    const bar = lg._objects.find(o => o.type === 'rect');
+                    const text = lg._objects.find(o => o.type === 'text');
+                    if (!bar || !text) return;
 
-                lg._isHeadlineLine = true;
-                lg._barRect = bar;
-                lg._headlineText = text;
+                    lg._isHeadlineLine = true;
+                    lg._barRect = bar;
+                    lg._headlineText = text;
 
-                let content = text.text;
+                    let content = text.text;
+                    text.text = "";
+
+                    // restore events
+                    text.on("changed", () => updateMultiLineHeadline(obj));
+                    text.on("modified", () => updateMultiLineHeadline(obj));
+
+                    text.text = content;
+                    obj._lineGroups.push(lg);
+
+                });
+            }
+            else{       // Single line headline
+                const bar = obj._objects.find(o => o.type === 'rect');
+                const text = obj._objects.find(o => o.type === 'text');
+                if(!bar || !text) return;
+
+                obj._isHeadlineGroup = true;
+                obj._barRect = bar;
+                obj._headlineText = text;
+                obj._lineGroups = [obj];
+
+                const content = text.text;
                 text.text = "";
 
-                // restore events
-                text.on("changed", () => updateMultiLineHeadline(obj));
-                text.on("modified", () => updateMultiLineHeadline(obj));
-
                 text.text = content;
-                obj._lineGroups.push(lg);
-            });
+
+            }
 
             // force recalculation
             obj._calcBounds();
@@ -1457,14 +1479,13 @@ function restoreHeadlines(canvas, jsonStr) {
                 left: left
             });
         }
-        if(obj._isKVLogo){
+        else if(obj._isKVLogo){
             const kvGroup = jsonStr.objects.find(o => o._isKVLogo);
             const textObj = kvGroup?.objects.find(o => o.type === "text");
 
             addKVLogo(textObj?.text);
             const isDark = DARK_BACKGROUNDS.includes(bgImageObj._bgSrc);
-            const variant = isDark ? 'light' : 'dark';
-            updateKVLogoVariant(variant);
+            updateKVLogoVariant(isDark ? 'light' : 'dark');
             obj.remove();
         }
     });
