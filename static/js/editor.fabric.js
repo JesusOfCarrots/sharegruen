@@ -1370,7 +1370,8 @@ exportBtn.addEventListener('click', () => {
 //#endregion
 
 //#region EXPORT/IMPORT as JSON
-document.getElementById("export-json").addEventListener('click', () => {
+const exportJsonBtn = isMobile ? document.getElementById("export-json-mob") : document.getElementById("export-json");
+exportJsonBtn.addEventListener('click', () => {
     const json = JSON.stringify(canvas.toJSON([
         '_isHeadlineGroup',
         '_isHeadlineChild',
@@ -1395,7 +1396,8 @@ document.getElementById("export-json").addEventListener('click', () => {
 });
 
 // Trigger file input for import
-document.getElementById("import-json").addEventListener('click', () => {
+const importJsonBtn = isMobile ? document.getElementById("import-json-mob") : document.getElementById("import-json");
+importJsonBtn.addEventListener('click', () => {
     document.getElementById("jsonFileInput").click();
 });
 

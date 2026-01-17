@@ -27,7 +27,10 @@
                 <a class="category-link" href="#" onclick="openDrawerSub('texts', event)">Textelemente</a>
                 <a class="category-link" href="#" onclick="openDrawerSub('images', event)">Bildelemente</a>
                 <a class="category-link" href="#" onclick="openDrawerSub('kv', event)">Kreisverband</a>
-
+                
+                <button id="export-json-mob">Speichern (JSON)</button>
+                <button id="import-json-mob">Laden (JSON)</button> <input type="file" id="jsonFileInput" accept="application/json" style="display:none">
+                
                 <button id="settings-btn" onclick="openSettings()" style="background-color: #fff; transform: scale(1.5); position: relative; margin-top: 100%;"></button>
                 <button id="mobExportBtn" style="float: right; position: relative; margin-top: 100%;">Exportieren (JPG)</button>
             </div>
