@@ -14,9 +14,19 @@ canvas.lowerCanvasEl.style.width = `${W}px`;
 canvas.lowerCanvasEl.style.height = `${H}px`;
 canvas.setDimensions({ width: W, height: H });
 
+fabric.Object.prototype.cornerColor = "#e1ff9b";
+fabric.Object.prototype.cornerStrokeColor = "#000000";
+fabric.Object.prototype.borderColor = "#00aaff";
+fabric.Object.prototype.transparentCorners = false;
+
 const stageContainer = document.getElementById('stage-container');
+const base_corner_size = 20;
+const max_corner_size = 60;
+const min_corner_size = 14;
 let scaleFactor = 1;
 let canvasMargin = 0.77; // use 77% of available space
+
+const isMobile = window.innerWidth < 768;
 
 function updateCanvasSclae(){
     const rect = stageContainer.getBoundingClientRect();
@@ -35,6 +45,18 @@ function updateCanvasSclae(){
 
     canvas.upperCanvasEl.style.transformOrigin = "top left";
     canvas.lowerCanvasEl.style.transformOrigin = "top left";
+
+    if(!isMobile){
+        fabric.Object.prototype.cornerSize = Math.max(
+            min_corner_size,
+            Math.min(max_corner_size, base_corner_size / scaleFactor));
+    }else{
+        fabric.Object.prototype.cornerSize = Math.max(
+            min_corner_size + 20,
+            Math.min(max_corner_size, base_corner_size / scaleFactor));
+    }
+    fabric.Object.prototype.borderScaleFactor = 1 / scaleFactor;
+    fabric.Object.prototype.padding = 6 / scaleFactor;
 
     canvas.calcOffset();
     canvas.requestRenderAll();
@@ -120,7 +142,6 @@ if (firstThumb) {
 
 //#region SIDEBAR
 let selected = null;
-const isMobile = window.innerWidth < 768;
 const propBox = isMobile ? document.getElementById('mobProperties') : document.getElementById('properties');
 
 function clearProps() {
@@ -1017,9 +1038,10 @@ scaleSlider.addEventListener('input', () => {
 
 //#region Mobile
 if(isMobile){
-    fabric.Object.prototype.cornerSize = 40;
-    fabric.Object.prototype.cornerStyle = "circle";
+    fabric.Object.prototype.cornerSize = 20;
     fabric.Object.prototype.transparentCorners = false;
+    fabric.Object.prototype.setControlsVisibility({
+    mt: false, mb: false, ml: false, mr: false});
 }
 //Drawer
 const drawer = document.getElementById('mobilePropertiesDrawer');
