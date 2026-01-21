@@ -770,21 +770,16 @@ uploadInput.addEventListener('change', async (e) => {
         return;
     }
 
+    addUploadedImageToCanvas(file);
+
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-        const res = await fetch('/upload', {
+        await fetch('/upload', {
             method: 'POST',
             body: formData
         });
-
-        const json = await res.json();
-        if(json.url) {
-            addUploadedImageToCanvas(json.url);
-        } else{
-            alert('Upload fehlgeschlagen.');
-        }
     } catch (err) {
         console.error(err);
         alert('Fehler beim Hochladen');
@@ -794,24 +789,29 @@ uploadInput.addEventListener('change', async (e) => {
     uploadInput.value = '';
 });
 
-function addUploadedImageToCanvas(url){
-    fabric.Image.fromURL(url, (img) => {
-        const maxWidth = W * 0.6;
-        const scale = Math.min(maxWidth / img.width, 1);
+function addUploadedImageToCanvas(file){
+    const reader = new FileReader();
 
-        img.set({
-            left: W / 2 - (img.width * scale) / 2,
-            top: H / 2 - (img.height * scale) / 2,
-            scaleX: scale,
-            scaleY: scale,
-            selectable: true,
-            evented: true
+    reader.onload = function (e){
+        fabric.Image.fromURL(e.target.result, (img) => {
+            const maxWidth = W * 0.6;
+            const scale = Math.min(maxWidth / img.width, 1);
+        
+            img.set({
+                left: W / 2 - (img.width * scale) / 2,
+                top: H / 2 - (img.height * scale) / 2,
+                scaleX: scale,
+                scaleY: scale,
+                selectable: true,
+                evented: true
+            });
+            canvas.add(img);
+            canvas.setActiveObject(img);
+            canvas.requestRenderAll();
         });
+    };
 
-        canvas.add(img);
-        canvas.setActiveObject(img);
-        canvas.requestRenderAll();
-    }, { crossOrigin: 'anonymous' });
+    reader.readAsDataURL(file);
 }
 
 //#endregion
