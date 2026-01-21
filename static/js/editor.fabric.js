@@ -308,7 +308,7 @@ canvas.on('selection:updated', (e) => {
 //#region ADD TEXT
 document.getElementById('addText').addEventListener('click', () => {
     const tb = new fabric.Textbox('Dein Text', {
-        left: 68, top: 540,
+        left: 78, top: Math.round(H / 2.25),
         fontSize: 60,
         fontFamily: FONT_FAMILY,
         fill: COLOR_BLACK,
@@ -379,8 +379,8 @@ function createHeadlineGroupMultiLine(textValue = ' ') {
     }
 
     const fullGroup = new fabric.Group(lineGroups, {
-        left: 50,
-        top: 150,
+        left: 70,
+        top: Math.round(H / 6.86),
         subTargetCheck: true,
         objectCaching: false
     });
@@ -541,7 +541,7 @@ document.getElementById('addHeadline').addEventListener('click', () => {
 
 // function for autopilot
 function createSingleHeadline(lineText = ""){
-    const fontSize = 90;
+    const fontSize = 100;
     const lineHeight = 1.3;
     const padX = 20;
 
@@ -572,8 +572,8 @@ function createSingleHeadline(lineText = ""){
     });
 
     const group = new fabric.Group([bar, text], {
-        left: 50,
-        top: 150,
+        left: 70,
+        top: Math.round(H / 6.86),
         subTargetCheck: true,
         objectCaching: false
     });
@@ -959,11 +959,11 @@ async function runAutopilot(autoExport = false) {
     // add headline || for every line add a new headline element offseted by 250
     if (autopilotData.headline){
         const lines = autopilotData.headline.split(/\r?\n/).filter(l => l.trim() !== '');
-        let yOffset = 150;
-        let offsetAmount = 110;
+        let yOffset = Math.round(H / 6.86); //150
+        let offsetAmount = Math.round(H / 10.63); //110
 
         await document.fonts.ready;
-        await document.fonts.load(`800 90px "${FONT_FAMILY}"`);
+        await document.fonts.load(`800 100px "${FONT_FAMILY}"`);
 
         for (const line of lines){
             // each line = its own headline group
@@ -978,7 +978,7 @@ async function runAutopilot(autoExport = false) {
     // ad. Text
     if (autopilotData.text) {
         const tb = new fabric.Textbox(autopilotData.text, {
-            left: 68, top: 540,
+            left: 78, top: Math.round(H / 2.25),
             fontSize: 60,
             fontFamily: FONT_FAMILY,
             fill: COLOR_BLACK,
@@ -1002,13 +1002,6 @@ function closeAutopilot(){
     const overlay = document.getElementById("autopilot-overlay");
     overlay.style.display = 'none';
 }
-/*
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.getElementById('autopilot-overlay').style.display === 'flex') {
-        document.getElementById('autopilot-next').click();
-    }
-}); 
-*/
 
 //#endregion
 const scaleSlider = document.getElementById('canvas-size-input');
