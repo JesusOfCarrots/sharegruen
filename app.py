@@ -14,7 +14,7 @@ FORMATS = {
         "label": "Instagram",
         "icon": "/static/img/sm_logos/instagram.svg",
         "formats": {
-            "insta_post":  {"w": 1080, "h": 1350, "label": "Instagram Post (1080×1350)"},
+            "insta_post":  {"w": 1080, "h": 1440, "label": "Instagram Post (1080×1440)"},
             "insta_story": {"w": 1080, "h": 1920, "label": "Instagram Story (1080×1920)"}
         }
     },

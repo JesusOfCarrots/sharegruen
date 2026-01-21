@@ -1305,8 +1305,6 @@ window.addEventListener('load', function() {
 
 //#region EXPORT as PNG
 async function exportSharepic(){
-    if (bgImageObj) canvas.sendToBack(bgImageObj);
-
     const active = canvas.getActiveObject();
     canvas.discardActiveObject();
     canvas.requestRenderAll();
