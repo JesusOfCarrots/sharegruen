@@ -74,6 +74,9 @@ const COLOR_PINK = '#f28ade';
 const COLOR_ORANGE = '#ff8568';
 const COLOR_DUNKELGRUEN = '#33c270';
 
+const DEFAULT_TEXT_LEFT = Math.round(W / 15.43);
+const DEFAULT_TEXT_TOP = Math.round(H / 6.86);
+
 // Map of dark and bright bgs for Logo 
 const DARK_BACKGROUNDS = [
     'GJ_dunkelGruen.png',
@@ -156,6 +159,32 @@ function addLabelInput(labelText, inputEl) {
     propBox.appendChild(lbl);
     propBox.appendChild(inputEl);
 }
+// Align Buttons
+const createAlignBtn = (innerHtml, onClick) => {
+    const btn = document.createElement('button');
+    btn.className = 'alignBtn';
+    btn.innerHTML = innerHtml;
+    btn.addEventListener('click', onClick);
+    return btn;
+};
+function alignCenter(pObj, posX, posY){
+    pObj.set({ left: (W - pObj.width) / 2 });
+    posX.value = Math.round(pObj.left);
+    posY.value = Math.round(pObj.top);
+    canvas.requestRenderAll();
+}
+function alignLeft(pObj, posX, posY){
+    pObj.set({ left: DEFAULT_TEXT_LEFT });
+    posX.value = Math.round(pObj.left);
+    posY.value = Math.round(pObj.top);
+    canvas.requestRenderAll();
+}
+function alignRight(pObj, posX, posY){
+    pObj.set({ left: canvas.getWidth() - pObj.getScaledWidth() - DEFAULT_TEXT_LEFT });
+    posX.value = Math.round(pObj.left); // refresh pos indicator
+    posY.value = Math.round(pObj.top);
+    canvas.requestRenderAll();
+}
 
 function showProps(obj) {
     if(isMobile) openPropertiesDrawer();
@@ -173,16 +202,36 @@ function showProps(obj) {
         </svg>
         `;
 
-
         delBtn.addEventListener('click', () => {
             canvas.remove(canvas.getActiveObject());
             canvas.requestRenderAll();
         });
         addLabelInput('Element löschen', delBtn);
-    }
 
-    // POS 
-    if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox || obj instanceof fabric.Image) {
+        //Centre | Align Left | Align Right
+        const alignDiv = document.createElement('div');
+        alignDiv.classList.add('alignDiv');
+        const alignCenterBtn = createAlignBtn(
+            `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3V21M22 12H15.5M15.5 12L19.5 16M15.5 12L19.5 8M2 12H8.5M8.5 12L4.5 16M8.5 12L4.5 8" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>`, () => alignCenter(obj, xInput, yInput));
+        const alignLeftBtn = createAlignBtn(
+            `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14 10C14.9319 10 15.3978 10 15.7654 9.84776C16.2554 9.64477 16.6448 9.25542 16.8478 8.76537C17 8.39782 17 7.93188 17 7C17 6.06812 17 5.60218 16.8478 5.23463C16.6448 4.74458 16.2554 4.35523 15.7654 4.15224C15.3978 4 14.9319 4 14 4L6 4C5.06812 4 4.60218 4 4.23463 4.15224C3.74458 4.35523 3.35523 4.74458 3.15224 5.23463C3 5.60218 3 6.06812 3 7C3 7.93188 3 8.39782 3.15224 8.76537C3.35523 9.25542 3.74458 9.64477 4.23463 9.84776C4.60218 10 5.06812 10 6 10L14 10Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18 20C18.9319 20 19.3978 20 19.7654 19.8478C20.2554 19.6448 20.6448 19.2554 20.8478 18.7654C21 18.3978 21 17.9319 21 17C21 16.0681 21 15.6022 20.8478 15.2346C20.6448 14.7446 20.2554 14.3552 19.7654 14.1522C19.3978 14 18.9319 14 18 14H6C5.06812 14 4.60218 14 4.23463 14.1522C3.74458 14.3552 3.35523 14.7446 3.15224 15.2346C3 15.6022 3 16.0681 3 17C3 17.9319 3 18.3978 3.15224 18.7654C3.35523 19.2554 3.74458 19.6448 4.23463 19.8478C4.60218 20 5.06812 20 6 20L18 20Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+            </svg>`, () => alignLeft(obj, xInput, yInput));
+        const alignRightBtn = createAlignBtn(
+            `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 10C18.9319 10 19.3978 10 19.7654 9.84776C20.2554 9.64477 20.6448 9.25542 20.8478 8.76537C21 8.39782 21 7.93188 21 7C21 6.06812 21 5.60218 20.8478 5.23463C20.6448 4.74458 20.2554 4.35523 19.7654 4.15224C19.3978 4 18.9319 4 18 4L10 4C9.06812 4 8.60218 4 8.23463 4.15224C7.74458 4.35523 7.35523 4.74458 7.15224 5.23463C7 5.60218 7 6.06812 7 7C7 7.93188 7 8.39782 7.15224 8.76537C7.35523 9.25542 7.74458 9.64477 8.23463 9.84776C8.60218 10 9.06812 10 10 10L18 10Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18 20C18.9319 20 19.3978 20 19.7654 19.8478C20.2554 19.6448 20.6448 19.2554 20.8478 18.7654C21 18.3978 21 17.9319 21 17C21 16.0681 21 15.6022 20.8478 15.2346C20.6448 14.7446 20.2554 14.3552 19.7654 14.1522C19.3978 14 18.9319 14 18 14H6C5.06812 14 4.60218 14 4.23463 14.1522C3.74458 14.3552 3.35523 14.7446 3.15224 15.2346C3 15.6022 3 16.0681 3 17C3 17.9319 3 18.3978 3.15224 18.7654C3.35523 19.2554 3.74458 19.6448 4.23463 19.8478C4.60218 20 5.06812 20 6 20L18 20Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>`, () => alignRight(obj, xInput, yInput));
+
+        alignDiv.append( 
+            alignLeftBtn,
+            alignCenterBtn,
+            alignRightBtn);
+
+        addLabelInput('Element ausrichten', alignDiv);
+
+        //POS
         // X
         const xInput = document.createElement('input');
         xInput.type = 'number';
@@ -218,6 +267,9 @@ function showProps(obj) {
 
 
     if (obj.type === 'textbox') {
+        fabric.Object.prototype.setControlsVisibility({  // show options for horizontal/vertical rezising
+        mt: true, mb: true, ml: true, mr: true});
+
         const textInput = document.createElement('textarea');
         textInput.type = 'text';
         textInput.style.cssText = `
@@ -256,6 +308,9 @@ function showProps(obj) {
     }
 
     if (obj.type === 'group' && obj._isHeadlineGroup) {
+        fabric.Object.prototype.setControlsVisibility({  // dont show options for horizontal/vertical rezising
+        mt: false, mb: false, ml: false, mr: false});
+
         const lineGroups = obj._lineGroups || [];
         const firstLine = lineGroups[0]?._headlineText;
 
@@ -305,31 +360,13 @@ function showProps(obj) {
         addLabelInput('Farbe:', svgColor);
     }
 }
+
 //#endregion
-
-function toHex(color) {
-    const ctx = document.createElement('canvas').getContext('2d');
-    ctx.fillStyle = color;
-    return ctx.fillStyle;
-}
-
-canvas.on('selection:cleared', () => {
-    selected = null;
-    clearProps();
-});
-canvas.on('selection:created', (e) => {
-    selected = e.selected && e.selected[0];
-    if (selected) showProps(selected);
-});
-canvas.on('selection:updated', (e) => {
-    selected = e.selected && e.selected[0];
-    if (selected) showProps(selected);
-});
 
 //#region ADD TEXT
 document.getElementById('addText').addEventListener('click', () => {
     const tb = new fabric.Textbox('Dein Text', {
-        left: 78, top: Math.round(H / 2.25),
+        left: DEFAULT_TEXT_LEFT + 8, top: Math.round(H / 2.25),
         fontSize: 60,
         fontFamily: FONT_FAMILY,
         fill: COLOR_BLACK,
@@ -400,8 +437,8 @@ function createHeadlineGroupMultiLine(textValue = ' ') {
     }
 
     const fullGroup = new fabric.Group(lineGroups, {
-        left: 70,
-        top: Math.round(H / 6.86),
+        left: DEFAULT_TEXT_LEFT,
+        top: DEFAULT_TEXT_TOP,
         subTargetCheck: true,
         objectCaching: false
     });
@@ -593,8 +630,8 @@ function createSingleHeadline(lineText = ""){
     });
 
     const group = new fabric.Group([bar, text], {
-        left: 70,
-        top: Math.round(H / 6.86),
+        left: DEFAULT_TEXT_LEFT,
+        top: DEFAULT_TEXT_TOP,
         subTargetCheck: true,
         objectCaching: false
     });
@@ -980,7 +1017,7 @@ async function runAutopilot(autoExport = false) {
     // add headline || for every line add a new headline element offseted by 250
     if (autopilotData.headline){
         const lines = autopilotData.headline.split(/\r?\n/).filter(l => l.trim() !== '');
-        let yOffset = Math.round(H / 6.86); //150
+        let yOffset = DEFAULT_TEXT_TOP; //150
         let offsetAmount = Math.round(H / 10.63); //110
 
         await document.fonts.ready;
@@ -999,7 +1036,7 @@ async function runAutopilot(autoExport = false) {
     // ad. Text
     if (autopilotData.text) {
         const tb = new fabric.Textbox(autopilotData.text, {
-            left: 78, top: Math.round(H / 2.25),
+            left: DEFAULT_TEXT_LEFT + 8, top: Math.round(H / 2.25),
             fontSize: 60,
             fontFamily: FONT_FAMILY,
             fill: COLOR_BLACK,
@@ -1515,3 +1552,25 @@ function restoreHeadlines(canvas, jsonStr) {
         }
     });
 }
+
+//#region Custom Settings 
+function toHex(color) {
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.fillStyle = color;
+    return ctx.fillStyle;
+}
+
+canvas.on('selection:cleared', () => {
+    selected = null;
+    clearProps();
+});
+canvas.on('selection:created', (e) => {
+    selected = e.selected && e.selected[0];
+    if (selected) showProps(selected);
+});
+canvas.on('selection:updated', (e) => {
+    selected = e.selected && e.selected[0];
+    if (selected) showProps(selected);
+});
+
+//#endregion

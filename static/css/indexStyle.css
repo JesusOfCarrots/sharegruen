@@ -54,8 +54,10 @@ p, li {
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 24px 28px;
+
     max-width: 520px;
-    width: 100%;
+    width: min(100%, 520px);
+    
     text-align: left;
 }
 .formats.active { display: block; }
