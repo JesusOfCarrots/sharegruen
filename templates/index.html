@@ -9,12 +9,13 @@
 </head>
 <body>
     <main class="container">
-        <h1 style="margin-top: 5px;">GJ 2024 Sharepic Generator</h1>
+        <h1>GJ 2024 Sharepic Generator</h1>
 
         <div class="tabs">
             {% for pkey, platform in platforms.items() %}
                 <div class="tab {% if loop.first %}active{% endif %}" data-target="{{ pkey }}">
-                    <img src="{{ platform.icon }}" alt="{{ platform.label }}">
+                    <img src="{{ platform.icon }}" alt="{{ platform.label }}"> 
+                    <span class="platfrom-label">| {{ platform.label }}</span>
                 </div>
             {% endfor %}
         </div>
@@ -53,6 +54,10 @@
         document.body.style.backgroundSize = "cover";
     </script>
 
-    <img src="/static/signature.svg" alt="Signature" class="signature">
+    <footer>
+        <img src="/static/signature.svg" alt="Signature" class="signature">
+        <p>Betrieben von der <a href="https://gj-nrw.de">Grünen Jugend NRW</a> &copy;</p>
+        <p><a href="https://gj-nrw.de/impressum/">Impresum</a>     <a href="#">Datenschutzerklärung</a></p>
+    </footer>
 </body>
 </html>
