@@ -28,6 +28,9 @@ let canvasMargin = 0.77; // use 77% of available space
 
 const isMobile = window.innerWidth < 768;
 
+stageContainer.style.width = `${W}px`;
+stageContainer.style.height = `${H}px`;
+
 function updateCanvasSclae(){
     const rect = stageContainer.getBoundingClientRect();
 
@@ -43,17 +46,16 @@ function updateCanvasSclae(){
     canvas.upperCanvasEl.style.transform = `scale(${scaleFactor})`;
     canvas.lowerCanvasEl.style.transform = `scale(${scaleFactor})`;
 
-    canvas.upperCanvasEl.style.transformOrigin = "top left";
-    canvas.lowerCanvasEl.style.transformOrigin = "top left";
-
     if(!isMobile){
         fabric.Object.prototype.cornerSize = Math.max(
-            min_corner_size,
-            Math.min(max_corner_size, base_corner_size / scaleFactor));
+            min_corner_size, Math.min(max_corner_size, base_corner_size / scaleFactor));
+        canvas.upperCanvasEl.style.transformOrigin = "top";
+        canvas.lowerCanvasEl.style.transformOrigin = "top";
     }else{
         fabric.Object.prototype.cornerSize = Math.max(
-            min_corner_size + 20,
-            Math.min(max_corner_size, base_corner_size / scaleFactor));
+            min_corner_size + 20, Math.min(max_corner_size, base_corner_size / scaleFactor));
+        canvas.upperCanvasEl.style.transformOrigin = "top left";
+        canvas.lowerCanvasEl.style.transformOrigin = "top left";
     }
     fabric.Object.prototype.borderScaleFactor = 1 / scaleFactor;
     fabric.Object.prototype.padding = 6 / scaleFactor;
