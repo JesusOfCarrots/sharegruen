@@ -170,7 +170,7 @@ const createAlignBtn = (innerHtml, onClick) => {
     return btn;
 };
 function alignCenter(pObj, posX, posY){
-    pObj.set({ left: (W - pObj.width) / 2 });
+    pObj.set({ left: (canvas.width - pObj.width * pObj.scaleX) / 2 });
     posX.value = Math.round(pObj.left);
     posY.value = Math.round(pObj.top);
     canvas.requestRenderAll();
