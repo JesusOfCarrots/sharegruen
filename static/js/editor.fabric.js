@@ -1,5 +1,16 @@
 fabric.devicePixelRatio = 1;
 
+async function loadFonts() {
+    const fonts = [
+        '800 100px "Wix Made For Display"',
+        '700 100px "Wix Made For Display"',
+        '600 100px "Wix Made For Display"'
+    ];
+
+    await Promise.all(fonts.map(f => document.fonts.load(f)));
+    await document.fonts.ready;
+}
+
 // Initialize Canvas
 const canvas = new fabric.Canvas('editorCanvas', {
     selection: true,
@@ -1076,9 +1087,6 @@ async function runAutopilot(autoExport = false) {
         const lines = autopilotData.headline.split(/\r?\n/).filter(l => l.trim() !== '');
         let yOffset = DEFAULT_TEXT_TOP; //150
         let offsetAmount = Math.round(H / 10.63); //110
-
-        await document.fonts.ready;
-        await document.fonts.load(`800 100px "${FONT_FAMILY}"`);
 
         for (const line of lines){
             // each line = its own headline group
