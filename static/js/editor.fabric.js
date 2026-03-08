@@ -1,15 +1,9 @@
 fabric.devicePixelRatio = 1;
 
-async function loadFonts() {
-    const fonts = [
-        '800 100px "Wix Made For Display"',
-        '700 100px "Wix Made For Display"',
-        '600 100px "Wix Made For Display"'
-    ];
-
-    await Promise.all(fonts.map(f => document.fonts.load(f)));
-    await document.fonts.ready;
-}
+//ensure font is loaded
+const font = new FontFace("Wix Made For Display", 'url("static/fonts/WixMadeforDisplay-VariableFont_wght.ttf"', { weight: 800 });
+document.fonts.add(font);
+font.load();
 
 // Initialize Canvas
 const canvas = new fabric.Canvas('editorCanvas', {
@@ -462,9 +456,7 @@ function createHeadlineGroupMultiLine(textValue = ' ') {
     let yOffset = 0;
 
     for (const line of lines) {
-        const safeText = line === "" ? " " : line;
-
-        const text = new fabric.Text(safeText, {
+        const text = new fabric.Text(line, {
             left: padX,
             top: yOffset + padY,
             fontSize: fontSize,
@@ -584,9 +576,7 @@ function updateMultiLineText(group, newText) {
     const newLineGroups = [];
 
     for (const line of lines) {
-        const safeText = line === "" ? " " : line;
-
-        const text = new fabric.Text(safeText, {
+        const text = new fabric.Text(line, {
             left: padX,
             top: yOffset,
             fontSize: initialFontSize,
