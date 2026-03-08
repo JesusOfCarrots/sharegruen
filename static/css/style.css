@@ -416,6 +416,72 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Table styles for monthly overview */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+th {
+  background-color: #33c270;
+  color: #ffffff;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+td {
+  padding: 12px 6px;
+  border-bottom: 1px solid #e1e1e1;
+}
+td input[type=text] { font-size: 14px; }
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+.overviewTable td:nth-child(2),
+.overviewTable th:nth-child(2) {
+  width: auto; /* content column grows */
+}
+
+.overviewTable td:nth-child(3),
+.overviewTable th:nth-child(3) {
+  width: 1%;        /* shrink to content */
+  white-space: nowrap;
+  text-align: center;
+}
+
+.monthOverviewInput{
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #e1e1e1;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+.monthOverviewInput:focus {
+  outline: none;
+  border-color: #33c270;
+  box-shadow: 0 0 0 3px rgba(51, 194, 112, 0.1);
+}
+.dateInput{
+  width: 80px;
+}
+
 @media screen and (max-width: 768px) {
   html, body{
     overflow-y: hidden;

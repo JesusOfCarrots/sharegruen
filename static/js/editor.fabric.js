@@ -148,9 +148,11 @@ if (firstThumb) {
 //#region SIDEBAR
 let selected = null;
 const propBox = isMobile ? document.getElementById('mobProperties') : document.getElementById('properties');
+let proboxHtml = propBox.innerHTML;
+console.log(propBox);
 
 function clearProps() {
-    propBox.innerHTML = '<p>Wähle ein Element aus, um es zu bearbeiten.</p>';
+    propBox.innerHTML = proboxHtml;
 }
 
 function addLabelInput(labelText, inputEl) {
@@ -194,7 +196,7 @@ function showProps(obj) {
     propBox.innerHTML = '';
 
     //DEL
-    if(obj._isPictogram || obj._isHeadlineGroup || obj instanceof fabric.Textbox || obj instanceof fabric.Image){
+    if(obj._isPictogram || obj._isHeadlineGroup || obj._isMonthRow || obj instanceof fabric.Textbox || obj instanceof fabric.Image){
         const delBtn = document.createElement('button');
         delBtn.classList.add('delBtn');
         delBtn.innerHTML = `
@@ -345,6 +347,59 @@ function showProps(obj) {
             });
             addLabelInput('Balkenfarbe:', barSelect);
         }
+    }
+
+    // MONTHLY OVERVIEW ROW
+    if(obj._isMonthRow){
+        fabric.Object.prototype.setControlsVisibility({  // dont show options for horizontal/vertical rezising
+        mt: false, mb: false, ml: false, mr: false});
+
+        const dateGroup = obj._dateGroup;
+        const dateTextElement = dateGroup.item(1);
+        const dateBarElement = dateGroup.item(0);
+
+        const contentGroup = obj._contentGroup;
+        const contentTextElement = contentGroup.item(1);
+        const contentBarElement = contentGroup.item(0);
+
+        const dateTextInput = document.createElement('input');
+        dateTextInput.type = 'text';
+        dateTextInput.value = dateTextElement.text || '';
+        dateTextInput.addEventListener('input', () => {
+            dateTextElement.text = dateTextInput.value.trim();
+            dateTextElement.initDimensions();
+
+            dateBarElement.set({
+                width: dateTextElement.width + 40,
+                height: (dateTextElement.fontSize * dateTextElement.lineHeight) + 20
+            });
+            dateGroup.addWithUpdate();
+
+            contentGroup.set({
+                left: dateGroup.left + dateGroup.getScaledWidth() - 3
+            });
+
+            obj.addWithUpdate();
+            canvas.requestRenderAll();
+        });
+        addLabelInput("Datum:", dateTextInput);
+
+        const contentTextInput = document.createElement('input');
+        contentTextInput.type = 'text';
+        contentTextInput.value = contentTextElement.text || '';
+        contentTextInput.addEventListener('input', () => {
+            contentTextElement.text = contentTextInput.value.trim();
+            contentTextElement.initDimensions();
+            contentBarElement.set({
+                width: contentTextElement.width + 40,
+                height: (contentTextElement.fontSize * contentTextElement.lineHeight) + 20
+            });
+            contentGroup.addWithUpdate()
+            obj.addWithUpdate()
+
+            canvas.requestRenderAll();
+        });
+        addLabelInput("Inhalt:", contentTextInput);
     }
     
     // SVG Color
@@ -1075,6 +1130,159 @@ scaleSlider.addEventListener('input', () => {
     scaleSliderText.textContent = Math.round(canvasMargin * 100) + '%';
 });
 
+//#region Monthly Overview
+function overviewForm(){
+    if (propBox){
+        let tableHtml = `
+        <table><thead>
+            <tr>
+                <th>Datum</th>
+                <th>Textinhalt</th>
+                <th></th>
+            </tr></thead>
+            <tbody class="overviewTable">
+            <tr class="row1">
+                <td><input type=text class="dateInput monthOverviewInput"></td>
+                <td><input type=text class="contentInput monthOverviewInput"></td>
+                <td class="removeBtnRow"><button class="removeRow">-</button></td>
+            </tr>
+            </tbody>
+            </table>
+
+            <button class="submitFormBtn" onclick="createMonthlyOverview()">Generieren</button>
+        `
+        
+        propBox.innerHTML = proboxHtml + tableHtml;
+        attachOverviewEventListeners();
+    }
+}
+
+function attachOverviewEventListeners(){
+    const tbody = document.querySelector('.overviewTable');
+    if (!tbody) return;
+    
+    // Attach event listeners to all dateInput fields
+    tbody.addEventListener('input', (e) => {
+        if (e.target.classList.contains('dateInput')){
+            addOverviewRow();
+        }
+    });
+    
+    // Attach event listeners to all removeRow buttons
+    const removeButtons = tbody.querySelectorAll('.removeRow');
+    removeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            btn.closest('tr').remove();
+        });
+    });
+}
+
+function addOverviewRow(){
+    const tbody = document.querySelector('.overviewTable');
+    if (!tbody) return;
+    
+    // Get the last row
+    const rows = tbody.querySelectorAll('tr');
+    const lastRow = rows[rows.length - 1];
+    const dateInput = lastRow.querySelector('.dateInput');
+
+    if(!dateInput.value.trim()) return;
+    
+    // Create a new row with the same structure
+    const newRow = document.createElement('tr');
+    newRow.className = `row${rows.length + 1}`;
+    newRow.innerHTML = `
+        <td><input type=text class="dateInput monthOverviewInput"></td>
+        <td><input type=text class="contentInput monthOverviewInput"></td>
+        <td class="removeBtnRow"><button class="removeRow">-</button></td>
+    `;
+    
+    // Append to tbody
+    tbody.appendChild(newRow);
+    
+    // Attach event listeners to the new row's removeRow button
+    const removeBtn = newRow.querySelector('.removeRow');
+    removeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        newRow.remove();
+    });
+}
+
+function createMonthlyOverview(pFontSize=48, pFontWeigth=800, padX=20, padY=10, dateBarColor=COLOR_HELLGRUEN, contentBarColor=COLOR_WHITE, rowSpacingFactor=36){
+    const tbody = document.querySelector('.overviewTable');
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll('tr');
+    let rowSpacing = 0;
+    rows.forEach(row => {
+        let date = row.querySelector('.dateInput').value;
+        let content = row.querySelector('.contentInput').value;
+
+        if(!date || !content) return;
+
+        console.log("date:", date , "conent:", content)
+
+        const dateText = new fabric.Text(date.trim(), {
+            left: padX,
+            top: padY,
+            fontSize: pFontSize,
+            fontFamily: FONT_FAMILY,
+            fontWeight: pFontWeigth,
+            fill: COLOR_BLACK,
+            editable: true
+        });
+        dateText.initDimensions();
+        const dateBar = new fabric.Rect({
+            left: 0,
+            top: 0,
+            width: dateText.width + padX * 2,
+            height: (dateText.fontSize * dateText.lineHeight) + padY * 2,
+            fill: dateBarColor,
+            selectable: false,
+            evented: false
+        })
+        const dateGroup = new fabric.Group([dateBar, dateText], {});
+
+        const contentText = new fabric.Text(content.trim(), {
+            left: padX,
+            top: padY,
+            fontSize: pFontSize,
+            fontFamily: FONT_FAMILY,
+            fontWeight: 800,
+            fontWeight: pFontWeigth,
+            editable: true
+        });
+        contentText.initDimensions();
+        const contentBar = new fabric.Rect({
+            left: 0,
+            top: 0,
+            width: contentText.width + padX * 2,
+            height: (contentText.fontSize * contentText.lineHeight) + padY * 2,
+            fill: contentBarColor,
+            selectable: false,
+            evented: false
+        });
+        const contentGroup = new fabric.Group([contentBar, contentText], {left: dateBar.width - 3});
+
+        const group = new fabric.Group([dateGroup, contentGroup], {
+            left: Math.round(W / 9),
+            top: Math.round(H / 2.87) + rowSpacing,
+            subTargetCheck: false,
+            objectCaching: false
+        });
+
+        group._isMonthRow = true;
+        group._dateGroup = dateGroup;
+        group._contentGroup = contentGroup;
+
+        canvas.add(group);
+
+        rowSpacing += contentGroup.height + rowSpacingFactor;
+    });
+}
+//#endregion
+
 //#region Mobile
 if(isMobile){
     fabric.Object.prototype.cornerSize = 20;
@@ -1160,8 +1368,7 @@ if(typeof canvas !== 'undefined'){
         if(window.innerWidth < 768){
             closePropertiesDrawer();
         }
-        const p = document.getElementById('properties');
-        if (p) p.innerHTML = '<p>Wähle ein Element aus, um es zu bearbeiten.</p>';
+        if (propBox) propBox.innerHTML = proboxHtml;
     });
 } else {
     console.warn('canvas ist nicht definiert – Fabric-Hooks wurden nicht registriert.')
@@ -1421,7 +1628,7 @@ exportBtn.addEventListener('click', () => {
 });
 //#endregion
 
-//#region EXPORT/IMPORT as JSON
+//#region EX/IMPORT as JSON
 const exportJsonBtn = isMobile ? document.getElementById("export-json-mob") : document.getElementById("export-json");
 exportJsonBtn.addEventListener('click', () => {
     const json = JSON.stringify(canvas.toJSON([
@@ -1430,6 +1637,9 @@ exportJsonBtn.addEventListener('click', () => {
         '_lineGroups',
         '_headlineText',
         '_parentGroup',
+        '_isMonthRow',
+        '_dateGroup',
+        '_contentGroup',
         '_isPictogram',
         '_bgSrc',
         '_barRect',
@@ -1463,7 +1673,7 @@ document.getElementById("jsonFileInput").addEventListener('change', (event) => {
       try {
         const json = JSON.parse(e.target.result);
         canvas.loadFromJSON(json, () => {
-            restoreHeadlines(canvas, json);
+            restoreAfterLoad(canvas, json);
             canvas.renderAll();
         });
 
@@ -1473,7 +1683,7 @@ document.getElementById("jsonFileInput").addEventListener('change', (event) => {
     };
     reader.readAsText(file);
 });
-function restoreHeadlines(canvas, jsonStr) {
+function restoreAfterLoad(canvas, jsonStr) {
     canvas.getObjects().forEach(obj => {
         if (obj.type === 'group' && obj._isHeadlineGroup) {
 
@@ -1532,6 +1742,12 @@ function restoreHeadlines(canvas, jsonStr) {
                 top: top,
                 left: left
             });
+        }
+        else if (obj._isMonthRow) {
+            if (obj._objects.length === 2) {
+                obj._dateGroup = obj._objects[0];
+                obj._contentGroup = obj._objects[1];
+            }
         }
         else if(obj._isKVLogo){
             const kvGroup = jsonStr.objects.find(o => o._isKVLogo);
