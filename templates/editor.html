@@ -105,7 +105,11 @@
             <h3>Eigenschaften</h3>
             <div id="properties">
                 <p>Wähle ein Element aus, um es zu bearbeiten oder erstelle eine <u>Monatsübersicht</u>.</p>
-                <button class="btn" onclick="overviewForm()">Übersicht erstellen.</button>
+                <div class="overview-toggle" onclick="toggleOverviewForm(event)">
+                    <span class="toggle-label">Monatsübersicht</span>
+                    <span class="toggle-arrow">▶</span>
+                </div>
+                <div id="overviewFormContainer" class="overview-form-container" style="display: none;"></div>
             </div>
         </div>
         <div id="mobilePropertiesDrawer" aria-hidden="true">

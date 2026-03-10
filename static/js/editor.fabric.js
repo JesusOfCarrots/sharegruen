@@ -1130,8 +1130,10 @@ scaleSlider.addEventListener('input', () => {
 
 //#region Monthly Overview
 function overviewForm(){
-    if (propBox){
-        let tableHtml = `
+    const container = document.getElementById('overviewFormContainer');
+    if (!container) return;
+    
+    let tableHtml = `
         <table><thead>
             <tr>
                 <th>Datum</th>
@@ -1148,10 +1150,43 @@ function overviewForm(){
             </table>
 
             <button class="submitFormBtn" onclick="createMonthlyOverview()">Generieren</button>
-        `
-        
-        propBox.innerHTML = proboxHtml + tableHtml;
-        attachOverviewEventListeners();
+        `;
+    
+    container.innerHTML = tableHtml;
+    attachOverviewEventListeners();
+}
+function toggleOverviewForm(event){
+    event.preventDefault();
+    const toggle = event.currentTarget;
+    const container = document.getElementById('overviewFormContainer');
+    const sidebar = propBox.parentElement; // get sidebar element
+    
+    if (!container) return;
+    
+    const isExpanded = toggle.classList.contains('expanded');
+    
+    if (isExpanded) {
+        // Collapse
+        toggle.classList.remove('expanded');
+        container.style.display = 'none';
+
+        if(sidebar) { sidebar.style.width = propBox.style.width; }
+        //adjust editor- and upper-canvas left
+        canvas.upperCanvasEl.style.transformOrigin = "top";
+        canvas.lowerCanvasEl.style.transformOrigin = "top";
+    } else {
+        // Expand and load form
+        toggle.classList.add('expanded');
+        container.style.display = 'block';
+        overviewForm();
+
+        //increese sidebar width
+        if (sidebar) {
+            sidebar.style.width = '600px';
+        }
+            //adjust editor- and upper-canvas left
+        canvas.upperCanvasEl.style.transformOrigin = "top left";
+        canvas.lowerCanvasEl.style.transformOrigin = "top left";
     }
 }
 

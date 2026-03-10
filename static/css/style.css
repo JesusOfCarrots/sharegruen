@@ -33,6 +33,7 @@
 }
 
 button, a {transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;}
+#sidebar, #editorCanvas { transition: all 250ms; --webkit-transition: width 250ms; -moz-transition: width 250ms; -o-transition: width 250ms; }
 html, body{
   margin: 0;
   padding: 0;
@@ -480,6 +481,63 @@ tr:hover {
 }
 .dateInput{
   width: 80px;
+}
+
+/* Overview Toggle Styles */
+.overview-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #f0f0f0;
+  transition: all 200ms ease;
+  user-select: none;
+  margin-top: 8px;
+}
+
+.overview-toggle:hover {
+  background: #e0e0e0;
+}
+
+.toggle-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.toggle-arrow {
+  display: inline-block;
+  transition: transform 250ms ease;
+  font-size: 12px;
+  color: #666;
+}
+
+.overview-toggle.expanded .toggle-arrow {
+  transform: rotate(90deg);
+}
+
+.overview-form-container {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fefefe;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  animation: slideDown 250ms ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    overflow: visible;
+  }
 }
 
 @media screen and (max-width: 768px) {
