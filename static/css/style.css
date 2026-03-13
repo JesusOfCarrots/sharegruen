@@ -485,7 +485,7 @@ tr:hover {
 }
 
 /* Overview Toggle Styles */
-.overview-toggle {
+.overview-toggle, .overview-mobile-toggle {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -498,7 +498,7 @@ tr:hover {
   margin-top: 8px;
 }
 
-.overview-toggle:hover {
+.overview-toggle:hover, .overview-mobile-toggle:hover {
   background: #e0e0e0;
 }
 
@@ -515,7 +515,7 @@ tr:hover {
   color: #666;
 }
 
-.overview-toggle.expanded .toggle-arrow {
+.overview-toggle.expanded .toggle-arrow, .overview-mobile-toggle.expanded .toggle-arrow {
   transform: rotate(90deg);
 }
 
