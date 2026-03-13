@@ -441,6 +441,7 @@ th {
 td {
   padding: 12px 6px;
   border-bottom: 1px solid #e1e1e1;
+  width: 12px;
 }
 td input[type=text] { font-size: 14px; }
 
@@ -480,7 +481,7 @@ tr:hover {
   box-shadow: 0 0 0 3px rgba(51, 194, 112, 0.1);
 }
 .dateInput{
-  width: 80px;
+  width: 100px;
 }
 
 /* Overview Toggle Styles */

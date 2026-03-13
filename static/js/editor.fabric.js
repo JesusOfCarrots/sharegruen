@@ -31,7 +31,7 @@ const min_corner_size = 14;
 let scaleFactor = 1;
 let canvasMargin = 0.77; // use 77% of available space
 
-const isMobile = window.innerWidth < 768;
+const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
 stageContainer.style.width = `${W}px`;
 stageContainer.style.height = `${H}px`;
@@ -154,7 +154,7 @@ if (firstThumb) {
 let selected = null;
 const propBox = isMobile ? document.getElementById('mobProperties') : document.getElementById('properties');
 let proboxHtml = propBox.innerHTML;
-console.log(propBox);
+const sidebar = isMobile ? document.getElementById('mobileSidebar') : document.getElementById('sidebar');
 
 function clearProps() {
     propBox.innerHTML = proboxHtml;
@@ -405,6 +405,32 @@ function showProps(obj) {
             canvas.requestRenderAll();
         });
         addLabelInput("Inhalt:", contentTextInput);
+
+        const fontSizeInput = document.createElement('input');
+        fontSizeInput.type = 'number';
+        fontSizeInput.value = contentTextElement.fontSize || 48;
+        fontSizeInput.addEventListener('input', () => {
+            contentTextElement.fontSize = fontSizeInput.value;
+            dateTextElement.fontSize = fontSizeInput.value;
+
+            contentTextElement.initDimensions();
+            dateTextElement.initDimensions();
+            contentBarElement.set({
+                width: contentTextElement.width + 40,
+                height: (contentTextElement.fontSize * contentTextElement.lineHeight) + 20
+            });
+            dateBarElement.set({
+                width: dateTextElement.width + 40,
+                height: (dateTextElement.fontSize * dateTextElement.lineHeight) + 20
+            });
+            dateGroup.addWithUpdate();
+            contentGroup.set({
+                left: dateGroup.left + dateGroup.getScaledWidth() - 3
+            });
+            obj.addWithUpdate();
+            canvas.requestRenderAll();
+        });
+        addLabelInput("Schriftgröße:", fontSizeInput);
     }
     
     // SVG Color
@@ -1159,7 +1185,6 @@ function toggleOverviewForm(event){
     event.preventDefault();
     const toggle = event.currentTarget;
     const container = document.getElementById('overviewFormContainer');
-    const sidebar = propBox.parentElement; // get sidebar element
     
     if (!container) return;
     
@@ -1170,23 +1195,36 @@ function toggleOverviewForm(event){
         toggle.classList.remove('expanded');
         container.style.display = 'none';
 
-        if(sidebar) { sidebar.style.width = propBox.style.width; }
-        //adjust editor- and upper-canvas left
-        canvas.upperCanvasEl.style.transformOrigin = "top";
-        canvas.lowerCanvasEl.style.transformOrigin = "top";
+        collapseOverviewForm();
     } else {
         // Expand and load form
         toggle.classList.add('expanded');
         container.style.display = 'block';
         overviewForm();
 
-        //increese sidebar width
-        if (sidebar) {
+        // On desktop we increase the sidebar width; on mobile the drawer should stay full width.
+        if (!isMobile && sidebar) {
             sidebar.style.width = '600px';
+            // adjust editor- and upper-canvas left
+            canvas.upperCanvasEl.style.transformOrigin = "top left";
+            canvas.lowerCanvasEl.style.transformOrigin = "top left";
         }
-            //adjust editor- and upper-canvas left
-        canvas.upperCanvasEl.style.transformOrigin = "top left";
-        canvas.lowerCanvasEl.style.transformOrigin = "top left";
+    }
+}
+
+function collapseOverviewForm(){
+    const container = document.getElementById('overviewFormContainer');
+    const toggle = document.querySelector('.overview-toggle');
+
+    if(container) container.style.display = 'none';
+    if(toggle) toggle.classList.remove('expanded');
+
+    if(!sidebar) return;
+
+    if (!isMobile) {
+        sidebar.style.width = propBox.style.width;
+        canvas.upperCanvasEl.style.transformOrigin = "top";
+        canvas.lowerCanvasEl.style.transformOrigin = "top";
     }
 }
 
@@ -1387,6 +1425,7 @@ if(typeof canvas !== 'undefined'){
         const obj = evt.target || canvas.getActiveObject();
         if(obj){
             showProps(obj);
+            collapseOverviewForm();
         }
     });
 
@@ -1394,14 +1433,15 @@ if(typeof canvas !== 'undefined'){
         const obj = evt.target || canvas.getActiveObject();
         if(obj){
             showProps(obj);
+            collapseOverviewForm();
         }
     });
 
     canvas.on('selection:cleared', () => {
-        if(window.innerWidth < 768){
+        if(isMobile){
             closePropertiesDrawer();
         }
-        if (propBox) propBox.innerHTML = proboxHtml;
+        collapseOverviewForm();
     });
 } else {
     console.warn('canvas ist nicht definiert – Fabric-Hooks wurden nicht registriert.')
@@ -1421,7 +1461,8 @@ function initMobileDrawer(){
 
 const propertiesDrawer = document.getElementById('mobilePropertiesDrawer');
 function openDrawerMain(){
-    const sidebar = document.getElementById('mobileSidebar');
+    if (!isMobile) return; // only relevant on mobile
+
     const menuBtn = document.getElementById('mobileMenuBtn');
 
     sidebar.style.width = '320px';
@@ -1434,29 +1475,34 @@ function openDrawerMain(){
     propertiesDrawer.style.display = 'none';
 }
 function closeDrawer(){
-    const sidebar = document.getElementById('mobileSidebar');
+    if (!isMobile) return; // only relevant on mobile
+
     const menuBtn = document.getElementById('mobileMenuBtn');
 
     sidebar.style.width = '0';
     sidebar.setAttribute('aria-hidden', 'true');
     menuBtn.style.display = 'grid';
     document.getElementById('mobileTopBar').style.display = 'flex';
-    propertiesDrawer.style.display = 'block';
+    // Unset the inline display so the CSS default can take over
+    propertiesDrawer.style.display = '';
 }
 
 function openDrawerSub(category, event){
+    if (!isMobile) return; // only relevant on mobile
+
     if(event) event.preventDefault();
     document.getElementById('drawerMain').style.display = 'none';
     document.getElementById('drawerSub').style.display = 'block';
     document.getElementById('drawerTitle').innerText = category.charAt(0).toUpperCase() + category.slice(1);
     populateSubmenu(category);
-    const sidebar = document.getElementById('mobileSidebar');
     if (!sidebar.style.width || sidebar.style.width === '0px'){
         sidebar.style.width = '320px';
     } 
 }
 
 function backToMain(){
+    if (!isMobile) return; // only relevant on mobile
+
     document.getElementById('drawerSub').style.display = 'none';
     document.getElementById('drawerMain').style.display = 'block';
     document.getElementById('drawerTitle').innerText = 'Kategorien';
@@ -1582,7 +1628,8 @@ function attachBgThumbClicks(){
 }
 
 document.addEventListener('click', function(e){
-    const sidebar = document.getElementById('mobileSidebar');
+    if (!isMobile) return; // only mobile should handle this
+
     const btn = document.getElementById('mobileMenuBtn');
     if (!sidebar || !btn) return;
     if (sidebar.style.width && sidebar.style.width !== '0px'){
