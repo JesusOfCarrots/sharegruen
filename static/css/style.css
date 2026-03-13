@@ -33,7 +33,7 @@
 }
 
 button, a {transition: all 500ms; -webkit-transition: all 500ms; -moz-transition: all 500ms; -o-transition: all 500ms;}
-#sidebar, #editorCanvas { transition: all 250ms; --webkit-transition: width 250ms; -moz-transition: width 250ms; -o-transition: width 250ms; }
+#sidebar, #editorCanvas { transition: all 250ms; --webkit-transition: all 250ms; -moz-transition: all 250ms; -o-transition: all 250ms; }
 html, body{
   margin: 0;
   padding: 0;
