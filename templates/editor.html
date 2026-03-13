@@ -184,7 +184,7 @@
 
         <div id="preview-container" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
 
-        <button onclick="downloadSelected()">
+        <button onclick="downloadAsZip()">
             Ausgewählte herunterladen
         </button>
 
@@ -230,5 +230,6 @@
         document.querySelector('#settings-screen input[type=range]').style.setProperty('--thumb-bg', `url('/static/backgrounds/GJ_Verlaufe_IG${r}.png') center/cover no-repeat`);
     </script>
     <script src="/static/js/editor.fabric.js"></script>
+    <script src="/static/js/jszip.min.js"></script>
 </body>
 </html>

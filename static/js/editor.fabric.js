@@ -1082,11 +1082,14 @@ async function createMultipleFromData(files){
     showPreviewModal(results);
 }
 async function renderSharepic(data){
-    createFromData(false, data);
+    canvas.clear();
+
+    await createFromData(false, data);
 
     await new Promise(resolve => {
-        canvas.once("after:render", resolve);
-        canvas.requestRenderAll();
+        fabric.util.requestAnimFrame(() => {
+            fabric.util.requestAnimFrame(resolve);
+        });
     });
 
     return canvas.toDataURL("image/png");
@@ -1118,6 +1121,32 @@ async function showPreviewModal(results){
     }
 
     modal.style.display = 'block';
+}
+async function downloadAsZip(){
+    const zip = new JSZip();
+
+    const checkboxes = document.querySelectorAll(
+        '#preview-container input[type="checkbox"]:checked');
+
+    checkboxes.forEach(cb => {
+        const index = cb.dataset.index;
+        const item = currentResults[index];
+
+        const base64 = item.previewImage.split(',')[1];
+
+        zip.file(
+            item.fileName.replace('.pdf', '.png'),
+            base64,
+            { base64: true }
+        );
+    });
+
+    const blob = await zip.generateAsync({ type: "blob" });
+
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'sharepics.zip';
+    link.click();
 }
 
 function downloadSelected(){
