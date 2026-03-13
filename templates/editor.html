@@ -117,7 +117,12 @@
             <div class="drawer-content">
                 <h3>Eigenschaften</h3>
                 <div id="mobProperties">
-                    <p>Wähle ein Element aus, um es zu bearbeiten.</p>
+                    <p>Wähle ein Element aus, um es zu bearbeiten oder erstelle eine <u>Monatsübersicht</u>.</p>
+                    <div class="overview-toggle" onclick="toggleOverviewForm(event)">
+                        <span class="toggle-label">Monatsübersicht</span>
+                        <span class="toggle-arrow">▶</span>
+                    </div>
+                    <div id="mobileOverviewFormContainer" class="overview-form-container" style="display: none;"></div>
                 </div>
             </div>
         </div>

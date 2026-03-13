@@ -1156,7 +1156,7 @@ scaleSlider.addEventListener('input', () => {
 
 //#region Monthly Overview
 function overviewForm(){
-    const container = document.getElementById('overviewFormContainer');
+    const container = isMobile ? document.getElementById('mobileOverviewFormContainer') : document.getElementById('overviewFormContainer');
     if (!container) return;
     
     let tableHtml = `
@@ -1184,7 +1184,7 @@ function overviewForm(){
 function toggleOverviewForm(event){
     event.preventDefault();
     const toggle = event.currentTarget;
-    const container = document.getElementById('overviewFormContainer');
+   const container = toggle.nextElementSibling;
     
     if (!container) return;
     
@@ -1213,8 +1213,8 @@ function toggleOverviewForm(event){
 }
 
 function collapseOverviewForm(){
-    const container = document.getElementById('overviewFormContainer');
-    const toggle = document.querySelector('.overview-toggle');
+    const container = isMobile ? document.getElementById('mobileOverviewFormContainer') : document.getElementById('overviewFormContainer');
+    const toggle = isMobile ? document.querySelector('overview-mobile-toggle') : document.querySelector('.overview-toggle');
 
     if(container) container.style.display = 'none';
     if(toggle) toggle.classList.remove('expanded');
