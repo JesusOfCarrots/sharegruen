@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, send_from_directory, jsonify, Response
 import os, re, base64
 from datetime import datetime
+import pypdf
+import re
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config['MAX_CONTENT_LENGTH'] = 6 * 1024 * 1024  # 6 MB
@@ -132,7 +134,39 @@ def list_piktogramme():
     files = [f for f in os.listdir(picto_dir) if f.lower().endswith(".svg")]
     return jsonify(files)
 
+@app.route('/create-from-pdf/', methods=['POST'])
+def create_from_pdf():
+    file = request.files.get("pdf")
 
+    if not file:
+        return jsonify({"error": "No file uploaded"}), 400
+    
+    data = read_pdf(file)
+    return jsonify(data)
+
+def read_pdf(pdf_filestr):
+    reader = pypdf.PdfReader(pdf_filestr)
+    full_text = ""
+    for page in reader.pages:
+        full_text += page.extract_text() + "\n"
+
+    pattern = r"- Sharepic erstellen:(.*?)(?=\n- |\Z)"
+    match = re.findall(pattern, full_text, re.DOTALL)
+
+    if not match:
+        return {"kv": "", "headline": "", "text": ""}
+    
+    block = match[0]
+    titel = re.search(r"Titel:\s*(.*)", block)
+    txt = re.search(r"text:\s*(.*)", block)
+    kv = re.search(r"kv:\s*(.*)", block)
+
+    result ={
+        "kv": kv.group(1).strip() if kv else "",
+        "headline": titel.group(1).strip() if titel else "",
+        "text": txt.group(1).strip() if txt else ""
+    }
+    return result
 
 @app.errorhandler(413)
 def file_too_large(e):

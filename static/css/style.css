@@ -72,7 +72,8 @@ body {
 #modalbox,
 #picto-select-screen,
 #autopilot-screen,
-#settings-screen {
+#settings-screen,
+#preview-modal {
   width: var(--dialog-width);
   max-width: var(--dialog-max-width);
   background: var(--dialog-bg);
@@ -254,7 +255,8 @@ body {
   #modalbox,
   #picto-select-screen,
   #autopilot-screen,
-  #settings-screen {
+  #settings-screen,
+  #preview-modal {
     --dialog-width: 70%;
     --dialog-max-width: 820px;
     --dialog-padding: 36px 48px;
@@ -267,7 +269,8 @@ body {
   #modalbox,
   #picto-select-screen,
   #autopilot-screen,
-  #settings-screen {
+  #settings-screen,
+  #preview-modal {
     --dialog-padding: 18px 16px;
     font-size: 16px;
   }
@@ -540,6 +543,19 @@ tr:hover {
     overflow: visible;
   }
 }
+
+#drop-zone{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  height: 50px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  color: slategray;
+  cursor: pointer;
+}
+#file-input { display: none; }
 
 @media screen and (max-width: 768px) {
   html, body{

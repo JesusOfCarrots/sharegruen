@@ -83,7 +83,10 @@
             <div class="tool-group">
                 <button id="export">Exportieren (JPG)</button>
                 <button id="export-json">Speichern (JSON)</button>
-                <button id="import-json">Laden (JSON)</button> <input type="file" id="jsonFileInput" accept="application/json" style="display:none"> <br>
+                <button id="import-json">Laden (JSON)</button> <input type="file" id="jsonFileInput" accept="application/json" style="display:none">
+                <label id="drop-zone">Drop file here or click to upload.
+                    <input type="file" id="file-input" multiple accept=".pdf, .docx" />
+                </label>
                 <button id="autopilotStart" onclick="startAutopilotDialouge()"><span>Autopilot</span></button>
             </div>
         </div>
@@ -133,7 +136,7 @@
             <h2>Piktogramme auswählen</h2>
             <input type="text" id="pictoSearch" placeholder="Suche...">
             <div id="pictoGrid"></div>
-            <button class="closeBtn" onclick="closePicto()">Schließen</button>
+            <button class="closeBtn" onclick="closeModal('picto-overlay')">Schließen</button>
         </div>
     </div>
 
@@ -172,8 +175,20 @@
                 <a href="https://github.com/JesusOfCarrots/sharegruen">https://github.com/JesusOfCarrots/sharegruen</a>
             </p>
             <p>Ein Projekt mit <img src="/static/img/heart-icon.svg" width="24px" height="24px" style="margin-top: 50px; vertical-align: -6px;"> von Mel :) </p>
-            <button class="btn" type="button" onclick="closeModal()">Okayy.</button>
+            <button class="btn" type="button" onclick="closeModal('overlay')">Okayy.</button>
         </div>
+    </div>
+
+    <div id="preview-modal" style="display: none;">
+        <h2>Sharepics auswählen</h2>
+
+        <div id="preview-container" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+
+        <button onclick="downloadSelected(currentResults)">
+            Ausgewählte herunterladen
+        </button>
+
+        <button class="btn" type="button" onclick="closeModal('preview-modal')">Schließen</button>
     </div>
 
     <script>
@@ -190,11 +205,8 @@
             }
         }
 
-        function closeModal() {
-            document.getElementById('overlay').style.display = 'none';
-        }
-        function closePicto() {
-            document.getElementById("picto-overlay").style.display = 'none';
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
         function openSettings() {
             document.getElementById("settings-overlay").style.display = "flex";

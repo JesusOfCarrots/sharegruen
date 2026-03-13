@@ -966,6 +966,163 @@ document.onkeydown = function(e) {
     }
 }
 
+//#region Upload PDF/DOCX
+const dropZone = document.getElementById('drop-zone');
+
+dropZone.addEventListener("drop", dropHanlder);
+window.addEventListener("drop", (e) => {
+    if ([...e.dataTransfer.items].some((item) => item.kind === 'file')) {
+        e.preventDefault();
+    }
+});
+dropZone.addEventListener("dragover", (e) => {
+    const fileItems = [...e.dataTransfer.items].filter(
+        (item) => item.kind === 'file',
+    );
+    if (fileItems.length > 0){
+        e.preventDefault();
+        if(fileItems.some((item) => item.type.startsWith('pdf'))) {
+            e.dataTransfer.dropEffect = 'copy';
+        } else{
+            e.dataTransfer.dropEffect = 'none';
+        }
+    }
+});
+window.addEventListener("dragover", (e) => {
+    const fileItems = [...e.dataTransfer.items].filter(
+        (item) => item.kind === 'file',
+    );
+    if (fileItems.length > 0){
+        e.preventDefault();
+        if(!dropZone.contains(e.target)){
+            e.dataTransfer.dropEffect = 'none';
+        }
+    }
+});
+
+function dropHanlder(ev){
+    ev.preventDefault();
+    const files = [...ev.dataTransfer.items]
+        .map((item) => item.getAsFile())
+        .filter((file) => file);
+}
+
+const fileInput = document.getElementById('file-input');
+fileInput.addEventListener('change', (e) => {
+    const files = e.target.files;
+    if (!files.length) return;
+
+    if (files.length > 1){
+        createMultipleFromData(files);
+        return;
+    }
+
+    const file = files[0];
+    const formData = new FormData();
+    formData.append("pdf", file);
+
+    //create sharepic from pdf file
+    fetch('/create-from-pdf', {
+        method: 'POST',
+        body: formData
+    })
+    .then(async response => {
+        if (!response.ok){
+            const err = await response.json();
+
+            if (response.status === 413) { alert(err.error); } // file too large
+            else { alert('Fehler beim Hochladen der Datei.'); }
+
+            throw new Error("Upload failed");
+        }
+        return response.json();
+    })
+    .then(data => {
+        createFromData(false, data);
+    })
+    .catch(err => {
+        console.log(err);
+    });
+});
+let currentResults = [];
+async function createMultipleFromData(files){
+    const results = [];
+    //generate sharepics 
+    for (const file of files){
+        const formData = new FormData();
+        formData.append("pdf", file);
+
+        try{
+            const response = await fetch('/create-from-pdf', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok){
+                const err = await response.json();
+
+                if (response.status === 413) alert(err.error); // file too large
+                else alert('Fehler beim Hochladen der Datei.');
+                continue; // skip this file and continue with the next
+            }
+
+            const data = await response.json();
+            if(data.kv || data.headline || data.text){
+                results.push({
+                    fileName: file.name,
+                    data: data
+                });
+            }
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    currentResults = results;
+    showPreviewModal(results);
+}
+
+function showPreviewModal(results){
+    const modal = document.getElementById("preview-modal");
+    const container = document.getElementById("preview-container");
+
+    container.innerHTML = "";
+
+    results.forEach((item, index) => {
+        // generate sharepic preview
+        createFromData(false, item.data);
+
+        //save as img
+        await new Promise(r => setTimeout(r, 300));
+        const imgSrc = canvas.toDataURL("image/png");
+        const wrapper = document.createElement('div');
+        wrapper.className = 'preview-item';
+
+        wrapper.innerHTML = `
+            <label>
+                <input type='checkbox' checked data-index="${index}">
+                <img src="${imgSrc}" width="200">
+                <div>${item.fileName}</div>
+            </label>
+        `;
+        container.appendChild(wrapper);
+    });
+
+    modal.style.display = 'block';
+}
+
+function downloadSelected(results){
+    const checkbockes = document.querySelectorAll(
+        '#preview-container input[type="checkbox"]:checked');
+
+        checkbockes.forEach(cb => {
+            const index = cb.dataset.index;
+            const item = results[index];
+
+            createFromData(true, item.data);
+        });
+}
+//#endregion
 
 //#region Autopilot
 const autopilotData = {
@@ -1068,7 +1225,7 @@ document.getElementById('autopilot-next').addEventListener('click', () => {
         const exportCheckbox = document.getElementById('autopilot-export');
         const shouldExport = exportCheckbox ? exportCheckbox.checked : false;
         autopilotData.autoExport = shouldExport;
-        runAutopilot(shouldExport);
+        createFromData(shouldExport);
     }
 });
 document.getElementById('autopilot-prev').addEventListener('click', () => {
@@ -1076,7 +1233,8 @@ document.getElementById('autopilot-prev').addEventListener('click', () => {
 });
 
 //generate Sharepic
-async function runAutopilot(autoExport = false) {
+async function createFromData(autoExport = false, dataSet=autopilotData) {
+    //console.log(dataSet, dataSet.kv, dataSet.headline, dataSet.text);
     const overlay = document.getElementById('autopilot-overlay');
     overlay.style.display = 'none';
 
@@ -1091,16 +1249,15 @@ async function runAutopilot(autoExport = false) {
         document.querySelectorAll('.bg-thumb').forEach(i => i.classList.remove('selected'));
         randomThumb.classList.add('selected');
     }
-
     // add KV Logo
-    if(autopilotData.kv) {
-        addKVLogo(autopilotData.kv);
+    if(dataSet.kv) {
+        addKVLogo(dataSet.kv);
         updateKVLogoVariant(variant);
     }
 
     // add headline || for every line add a new headline element offseted by 250
-    if (autopilotData.headline){
-        const lines = autopilotData.headline.split(/\r?\n/).filter(l => l.trim() !== '');
+    if (dataSet.headline){
+        const lines = dataSet.headline.split(/\r?\n/).filter(l => l.trim() !== '');
         let yOffset = DEFAULT_TEXT_TOP; //150
         let offsetAmount = Math.round(H / 10.63); //110
 
@@ -1115,8 +1272,8 @@ async function runAutopilot(autoExport = false) {
     }
 
     // ad. Text
-    if (autopilotData.text) {
-        const tb = new fabric.Textbox(autopilotData.text, {
+    if (dataSet.text) {
+        const tb = new fabric.Textbox(dataSet.text, {
             left: DEFAULT_TEXT_LEFT + 8, top: Math.round(H / 2.25),
             fontSize: 60,
             fontFamily: FONT_FAMILY,
