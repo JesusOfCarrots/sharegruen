@@ -1081,46 +1081,57 @@ async function createMultipleFromData(files){
     currentResults = results;
     showPreviewModal(results);
 }
+async function renderSharepic(data){
+    createFromData(false, data);
 
-function showPreviewModal(results){
+    await new Promise(resolve => {
+        canvas.once("after:render", resolve);
+        canvas.requestRenderAll();
+    });
+
+    return canvas.toDataURL("image/png");
+}
+
+async function showPreviewModal(results){
+    await new Promise(r => setTimeout(r, 300));
     const modal = document.getElementById("preview-modal");
     const container = document.getElementById("preview-container");
 
     container.innerHTML = "";
 
-    results.forEach((item, index) => {
-        // generate sharepic preview
-        createFromData(false, item.data);
+    for (let i = 0; i < results.length; i++){
+        const item = results[i];
+        const imgSrc = await renderSharepic(item.data);
+        item.previewImage = imgSrc;
 
-        //save as img
-        await new Promise(r => setTimeout(r, 300));
-        const imgSrc = canvas.toDataURL("image/png");
         const wrapper = document.createElement('div');
         wrapper.className = 'preview-item';
 
         wrapper.innerHTML = `
             <label>
-                <input type='checkbox' checked data-index="${index}">
+                <input type='checkbox' checked data-index="${i}">
                 <img src="${imgSrc}" width="200">
                 <div>${item.fileName}</div>
             </label>
         `;
         container.appendChild(wrapper);
-    });
+    }
 
     modal.style.display = 'block';
 }
 
-function downloadSelected(results){
+function downloadSelected(){
     const checkbockes = document.querySelectorAll(
         '#preview-container input[type="checkbox"]:checked');
 
-        checkbockes.forEach(cb => {
-            const index = cb.dataset.index;
-            const item = results[index];
-
-            createFromData(true, item.data);
-        });
+    checkbockes.forEach(cb => {
+        const index = cb.dataset.index;
+        const item = currentResults[index];
+        const link = document.createElement('a');
+        link.href = item.previewImage;
+        link.download = item.fileName.replace('.pdf', '.png');
+        link.click();
+    });
 }
 //#endregion
 
